@@ -12,9 +12,11 @@ public class TaskManager {
 
     public void setTasks(String name, String description, Status status) {
         Task task = new Task(name, description, status);
+
         if (tasks.containsKey(task.hashCode())) {
             return;
         }
+
         tasks.put(task.hashCode(), task);
     }
 
@@ -22,6 +24,7 @@ public class TaskManager {
         if (tasks.containsKey(task.hashCode())) {
             return;
         }
+
         tasks.put(task.hashCode(), task);
     }
 
@@ -36,9 +39,11 @@ public class TaskManager {
 
     public void setEpics(String name, String description) {
         Epic epic = new Epic(name, description);
+
         if (epics.containsKey(epic.hashCode())) {
             return;
         }
+
         epics.put(epic.hashCode(), epic);
     }
 
