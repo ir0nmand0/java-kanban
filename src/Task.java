@@ -3,14 +3,15 @@ import java.util.Objects;
 public class Task {
     private final String name;
     private final String description;
-    private final Integer id;
+    private final Integer mainId;
     protected Status status;
+    private static Integer newId = 1;
 
-    public Task(String name, String description, Integer id, Status status) {
+    public Task(String name, String description, Status status) {
         this.name = name;
         this.description = description;
         this.status = status;
-        this.id = id;
+        this.mainId = getNewId();
     }
 
     public Status getStatus() {
@@ -23,12 +24,20 @@ public class Task {
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
         return Objects.equals(name, task.name) && Objects.equals(description, task.description) &&
-                status == task.status && Objects.equals(id, task.id);
+                status == task.status && Objects.equals(mainId, task.mainId);
+    }
+
+    private static Integer getNewId() {
+        if (newId == Integer.MAX_VALUE) {
+            return 0;
+        }
+
+        return newId++;
     }
 
     @Override
     public int hashCode() {
-        return id;
+        return mainId;
     }
 
     @Override
@@ -36,7 +45,7 @@ public class Task {
         return "Task{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", id=" + id +
+                ", id=" + mainId +
                 ", status=" + status +
                 '}';
     }

@@ -5,8 +5,8 @@ public class Epic extends Task {
 
     private HashMap <Integer, Subtask> subtasks;
 
-    public Epic(String name, String description, Integer id) {
-        super(name, description, id, Status.NEW);
+    public Epic(String name, String description) {
+        super(name, description, Status.NEW);
         subtasks = new HashMap<>();
     }
 
@@ -35,13 +35,19 @@ public class Epic extends Task {
         return true;
     }
 
-    public boolean updateSubtasks(Subtask subtask) {
+    public boolean updateSubtasks(Subtask oldSubtask, Subtask subtask) {
         Integer taskId = subtask.hashCode();
+        Integer oldTaskId = oldSubtask.hashCode();
 
-        if (!subtasks.containsKey(taskId)) {
+        if (!subtasks.containsKey(oldTaskId)) {
             return false;
         }
 
+        if (subtasks.containsKey(taskId)) {
+            return false;
+        }
+
+        subtasks.remove(oldTaskId);
         subtasks.put(taskId, subtask);
         updateStatus();
         return true;

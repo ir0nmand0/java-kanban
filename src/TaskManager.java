@@ -2,7 +2,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TaskManager {
-    private Integer id = 1;
     private final HashMap<Integer, Task> tasks;
     private final HashMap<Integer, Epic> epics;
 
@@ -12,12 +11,18 @@ public class TaskManager {
     }
 
     public void setTasks(String name, String description, Status status) {
-        Integer newId = getNewId();
-        tasks.put(newId, new Task(name, description, newId, status));
+        Task task = new Task(name, description, status);
+        if (tasks.containsKey(task.hashCode())) {
+            return;
+        }
+        tasks.put(task.hashCode(), task);
     }
 
     public void addTasks(Task task) {
-        tasks.put(getNewId(), task);
+        if (tasks.containsKey(task.hashCode())) {
+            return;
+        }
+        tasks.put(task.hashCode(), task);
     }
 
     public boolean updateTasks(Task task) {
@@ -30,8 +35,11 @@ public class TaskManager {
     }
 
     public void setEpics(String name, String description) {
-        Integer newId = getNewId();
-        epics.put(newId, new Epic(name, description, newId));
+        Epic epic = new Epic(name, description);
+        if (epics.containsKey(epic.hashCode())) {
+            return;
+        }
+        epics.put(epic.hashCode(), epic);
     }
 
     public boolean addEpics(Epic epic) {
@@ -55,14 +63,14 @@ public class TaskManager {
         return epics.get(epicId).addSubtasks(subtask);
     }
 
-    public boolean updateSubtasks(Epic epic, Subtask subtask) {
+    public boolean updateSubtasks(Epic epic, Subtask oldSubtask, Subtask subtask) {
         Integer epicId = epic.hashCode();
 
         if (checkEpicAndSubtaskId(epicId, subtask)) {
             return false;
         }
 
-        return epics.get(epicId).updateSubtasks(subtask);
+        return epics.get(epicId).updateSubtasks(oldSubtask, subtask);
     }
 
     private boolean checkEpicAndSubtaskId(int epicId, Subtask subtask) {
@@ -85,17 +93,9 @@ public class TaskManager {
         }
 
         HashMap <Integer, Subtask> subtasks = new HashMap<>();
-        Integer newId = getNewId();
-        subtasks.put(newId, new Subtask(name, description, newId, status, epics.get(epicId)));
+        Subtask subtask = new Subtask(name, description, status, epics.get(epicId));
+        subtasks.put(subtask.hashCode(), subtask);
         epics.get(epicId).setSubtasks(subtasks);
-    }
-
-    public Integer getNewId() {
-        if (id == Integer.MAX_VALUE) {
-            return 0;
-        }
-
-        return id++;
     }
 
     public Map<Integer, Epic> getEpics() {

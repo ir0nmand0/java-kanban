@@ -1,10 +1,4 @@
 
 7
-java:S1220""Move this file to a named package.8èð÷½È1
-V
-java:S1854"9Remove this useless assignment to local variable "newId".(¥Ã¤¼8íð÷½È1
-G	java:S106"+Replace this use of System.out by a logger.(í•æ§8îð÷½È1
-G
-java:S1481"*Remove this unused "newId" local variable.(¥Ã¤¼8²´ø½È1
-X	java:S125"<This block of commented-out lines of code should be removed.(…Ÿú€8º“ÅÀÈ1
-G	java:S106"+Replace this use of System.out by a logger.(­¬¡Ë8òð÷½È1
+java:S1220""Move this file to a named package.8ÿšäÃÈ1
+]	java:S125"<This block of commented-out lines of code should be removed.(¬žûÁûÿÿÿÿ8‚›äÃÈ1
