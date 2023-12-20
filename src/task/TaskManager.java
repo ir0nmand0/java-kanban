@@ -1,3 +1,5 @@
+package task;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -109,7 +111,7 @@ public class TaskManager {
 
     @Override
     public String toString() {
-        return "TaskManager{" +
+        return "task.TaskManager{" +
                 "tasks=" + tasks +
                 ",\n\t\t\t\tepics=" + epics +
                 '}';
