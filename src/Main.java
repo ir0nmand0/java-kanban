@@ -2,7 +2,8 @@ public class Main {
 
     public static void main(String[] args) {
 
-/*        //тесты
+/*
+        //тесты
         TaskManager taskManager = new TaskManager();
         Task task1 = new Task("Задача 1", "Описание задачи 1", Status.NEW);
         Task task2 = new Task("Задача 2", "Описание задачи 2", Status.IN_PROGRESS);
@@ -46,7 +47,8 @@ public class Main {
         taskManager.clearTasks();
         taskManager.clearEpics();
 
-        System.out.println("taskManager = " + taskManager);*/
+        System.out.println("taskManager = " + taskManager);
+*/
 
     }
 }

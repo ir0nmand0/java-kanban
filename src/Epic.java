@@ -3,7 +3,7 @@ import java.util.Map;
 
 public class Epic extends Task {
 
-    private HashMap <Integer, Subtask> subtasks;
+    private Map <Integer, Subtask> subtasks;
 
     public Epic(String name, String description) {
         super(name, description, Status.NEW);
@@ -14,7 +14,7 @@ public class Epic extends Task {
         return subtasks;
     }
 
-    public void setSubtasks(HashMap<Integer, Subtask> subtasks) {
+    public void setSubtasks(Map<Integer, Subtask> subtasks) {
         if (!subtasks.isEmpty()) {
             subtasks.putAll(this.subtasks);
         }
