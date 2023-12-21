@@ -1,4 +1,4 @@
-package task;
+package model;
 
 import java.util.Objects;
 
@@ -37,14 +37,10 @@ public class Task {
         return newId++;
     }
 
-    @Override
-    public int hashCode() {
-        return mainId;
-    }
 
     @Override
     public String toString() {
-        return "task.Task{" +
+        return "model.Task{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", id=" + mainId +
@@ -52,4 +48,12 @@ public class Task {
                 '}';
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, description, mainId, status);
+    }
+
+    public int getId() {
+        return mainId;
+    }
 }

@@ -1,4 +1,4 @@
-package task;
+package model;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +26,7 @@ public class Epic extends Task {
     }
 
     public boolean addSubtasks(Subtask subtask) {
-        Integer taskId = subtask.hashCode();
+        Integer taskId = subtask.getId();
 
         if (subtasks.containsKey(taskId)) {
             return false;
@@ -38,8 +38,8 @@ public class Epic extends Task {
     }
 
     public boolean updateSubtasks(Subtask oldSubtask, Subtask subtask) {
-        Integer taskId = subtask.hashCode();
-        Integer oldTaskId = oldSubtask.hashCode();
+        Integer taskId = subtask.getId();
+        Integer oldTaskId = oldSubtask.getId();
 
         if (!subtasks.containsKey(oldTaskId)) {
             return false;
@@ -56,34 +56,30 @@ public class Epic extends Task {
     }
 
     private void updateStatus() {
-        int sumNew = 0;
-        int sumDone = 0;
+        int sumInProgress = 0;
+
         for (Map.Entry<Integer, Subtask> entry : subtasks.entrySet()) {
-            switch (entry.getValue().getStatus()) {
-                case NEW:
-                    ++sumNew;
-                    break;
-                case DONE:
-                    ++sumDone;
-                    break;
+            if (entry.getValue().getStatus().equals(Status.IN_PROGRESS)) {
+                ++sumInProgress;
+            } else if (entry.getValue().getStatus().equals(Status.DONE)) {
+                --sumInProgress;
             }
+        }
 
-            int sizeSubtasks = subtasks.size();
+        int sizeSubtask = subtasks.size();
 
-            if (sumNew == sizeSubtasks || sizeSubtasks == 0) {
-                status = Status.NEW;
-            } else if (sumDone == sizeSubtasks) {
-                status = Status.DONE;
-            } else {
-                status = Status.IN_PROGRESS;
-            }
-
+        if (sizeSubtask == 0 || sumInProgress == 0) {
+            status = Status.NEW;
+        } else if (sizeSubtask + sumInProgress == 0) {
+            status = Status.DONE;
+        } else {
+            status = Status.IN_PROGRESS;
         }
     }
 
     @Override
     public String toString() {
-        return "task.Epic{" +
+        return "model.Epic{" +
                 "subtasks=" + subtasks +
                 '}';
     }

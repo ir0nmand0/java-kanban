@@ -1,5 +1,10 @@
 package task;
 
+import model.Epic;
+import model.Status;
+import model.Subtask;
+import model.Task;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,42 +20,47 @@ public class TaskManager {
     public void setTasks(String name, String description, Status status) {
         Task task = new Task(name, description, status);
 
-        if (tasks.containsKey(task.hashCode())) {
+        if (tasks.containsKey(task.getId())) {
             return;
         }
 
-        tasks.put(task.hashCode(), task);
+        tasks.put(task.getId(), task);
     }
 
     public void addTasks(Task task) {
-        if (tasks.containsKey(task.hashCode())) {
+        if (tasks.containsKey(task.getId())) {
             return;
         }
 
-        tasks.put(task.hashCode(), task);
+        tasks.put(task.getId(), task);
     }
 
-    public boolean updateTasks(Task task) {
-        if (!tasks.containsKey(task.hashCode())) {
+    public boolean updateTasks(Task oldTask, Task task) {
+        if (!tasks.containsKey(oldTask.getId())) {
             return false;
         }
 
-        tasks.put(task.hashCode(), task);
+        if (tasks.containsKey(task.getId())) {
+            return false;
+        }
+
+        tasks.remove(oldTask.getId());
+        tasks.put(task.getId(), task);
         return true;
     }
 
     public void setEpics(String name, String description) {
         Epic epic = new Epic(name, description);
 
-        if (epics.containsKey(epic.hashCode())) {
+        if (epics.containsKey(epic.getId())) {
             return;
         }
 
-        epics.put(epic.hashCode(), epic);
+        epics.put(epic.getId(), epic);
     }
 
     public boolean addEpics(Epic epic) {
-        Integer epicId = epic.hashCode();
+        Integer epicId = epic.getId();
 
         if (epics.containsKey(epicId)) {
             return false;
@@ -61,7 +71,7 @@ public class TaskManager {
     }
 
     public boolean addSubtasks(Epic epic, Subtask subtask) {
-        Integer epicId = epic.hashCode();
+        Integer epicId = epic.getId();
 
         if (checkEpicAndSubtaskId(epicId, subtask)) {
             return false;
@@ -71,7 +81,7 @@ public class TaskManager {
     }
 
     public boolean updateSubtasks(Epic epic, Subtask oldSubtask, Subtask subtask) {
-        Integer epicId = epic.hashCode();
+        Integer epicId = epic.getId();
 
         if (checkEpicAndSubtaskId(epicId, subtask)) {
             return false;
@@ -86,7 +96,7 @@ public class TaskManager {
             return true;
         }
 
-        if (subtask.getEpic().hashCode() == 0) {
+        if (subtask.getEpic().getId() == 0) {
             return true;
         }
 
@@ -101,7 +111,7 @@ public class TaskManager {
 
         HashMap <Integer, Subtask> subtasks = new HashMap<>();
         Subtask subtask = new Subtask(name, description, status, epics.get(epicId));
-        subtasks.put(subtask.hashCode(), subtask);
+        subtasks.put(subtask.getId(), subtask);
         epics.get(epicId).setSubtasks(subtasks);
     }
 
@@ -139,7 +149,7 @@ public class TaskManager {
     }
 
     public boolean removeTask(Task task) {
-        return removeTaskViaId(task.hashCode());
+        return removeTaskViaId(task.getId());
     }
 
     public boolean removeSubtaskViaId(Integer epicId, Integer subtaskId) {
@@ -156,7 +166,7 @@ public class TaskManager {
     }
 
     public boolean removeSubtask(Epic epic, Subtask subtask) {
-        return removeSubtaskViaId(epic.hashCode(), subtask.hashCode());
+        return removeSubtaskViaId(epic.getId(), subtask.getId());
     }
 
     public boolean removeEpicViaId(Integer id) {
@@ -173,7 +183,7 @@ public class TaskManager {
     }
 
     public boolean removeEpic(Epic epic) {
-        return removeEpicViaId(epic.hashCode());
+        return removeEpicViaId(epic.getId());
     }
 
     public void clearTasks() {
@@ -208,7 +218,7 @@ public class TaskManager {
     }
 
     public Map<Integer, Subtask> getSubtasksFromEpic(Epic epic) {
-        return getSubtasksFromEpicViaId(epic.hashCode());
+        return getSubtasksFromEpicViaId(epic.getId());
     }
 
 }

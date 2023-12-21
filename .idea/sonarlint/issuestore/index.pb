@@ -37,3 +37,11 @@ E
 src/task/Subtask.java,b\4\b4fba59b5a6f6eb6b74e9613d5f800634e34de9f
 C
 src/utils/Main.java,4\0\4060d1ad2615e5b33b137902af0d6d6d9ee4481f
+C
+src/model/Epic.java,1\5\15fb8ff594e3a81ac2d9c626287e891985bba15d
+C
+src/model/Task.java,f\8\f832a384be168e161b98ea99b51d3c78b15a5a6b
+E
+src/model/Status.java,9\4\9426782f3e2fa53e0e77506ab5c68ba1dd2a0228
+F
+src/model/Subtask.java,6\b\6bba45984ebbd1cd2e9eadd49ae201ac02cd181d
