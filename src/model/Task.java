@@ -25,8 +25,8 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return Objects.equals(name, task.name) && Objects.equals(description, task.description) &&
-                status == task.status && Objects.equals(mainId, task.mainId);
+        return Objects.equals(name, task.name) && Objects.equals(description, task.description)
+                && status == task.status && Objects.equals(mainId, task.mainId);
     }
 
     private static Integer getNewId() {
