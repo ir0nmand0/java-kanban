@@ -1,58 +1,45 @@
 package model;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public class Epic extends Task {
 
-    private Map <Integer, Subtask> subtasks;
+    private final Map <Integer, Subtask> subtasks = new HashMap<>();
 
     public Epic(String name, String description) {
         super(name, description, Status.NEW);
-        subtasks = new HashMap<>();
     }
 
     public Map<Integer, Subtask> getSubtasks() {
         return subtasks;
     }
 
-    public void setSubtasks(Map<Integer, Subtask> subtasks) {
-        if (!subtasks.isEmpty()) {
-            subtasks.putAll(this.subtasks);
-        }
-
-        this.subtasks = subtasks;
-        updateStatus();
-    }
-
-    public boolean addSubtasks(Subtask subtask) {
+    public void setSubtask(Subtask subtask) {
         Integer taskId = subtask.getId();
 
         if (subtasks.containsKey(taskId)) {
-            return false;
+            return;
         }
 
         subtasks.put(taskId, subtask);
         updateStatus();
-        return true;
     }
 
-    public boolean updateSubtasks(Subtask oldSubtask, Subtask subtask) {
+    public void updateSubtask(Subtask oldSubtask, Subtask subtask) {
         Integer taskId = subtask.getId();
         Integer oldTaskId = oldSubtask.getId();
 
         if (!subtasks.containsKey(oldTaskId)) {
-            return false;
+            return;
         }
 
         if (subtasks.containsKey(taskId)) {
-            return false;
+            return;
         }
 
         subtasks.remove(oldTaskId);
         subtasks.put(taskId, subtask);
         updateStatus();
-        return true;
     }
 
     private void updateStatus() {
@@ -79,7 +66,7 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return "model.Epic{" +
+        return "Epic{" +
                 "subtasks=" + subtasks +
                 '}';
     }
