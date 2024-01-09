@@ -1,7 +1,5 @@
 package manager;
 
-import model.Task;
-
 public class Managers {
     private static final HistoryManager historyManager = new InMemoryHistoryManager();
     private static final TaskManager taskManager = new InMemoryTaskManager();

@@ -23,35 +23,30 @@ public class EpicTest {
             Status.NEW,
             epic1
     );
-
     private final Subtask subtask2 = new Subtask(
             "Subtask Subtask2",
             "Subtask2 description",
             Status.IN_PROGRESS,
             epic1
     );
-
     private final Subtask subtask3 = new Subtask(
             "Subtask Subtask3",
             "Subtask3 description",
             Status.NEW,
             epic1
     );
-
     private final Subtask subtask4 = new Subtask(
             "Subtask Subtask4",
             "Subtask4 description",
             Status.NEW,
             epic2
     );
-
     private final Subtask subtask5 = new Subtask(
             "Subtask Subtask5",
             "Subtask5 description",
             Status.IN_PROGRESS,
             epic2
     );
-
     private final Subtask subtask6 = new Subtask(
             "Subtask Subtask6",
             "Subtask6 description",

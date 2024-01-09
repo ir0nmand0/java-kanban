@@ -5,7 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="69fc4ede-133c-4e82-988e-f80d85bcaa9f" name="Changes" comment="Final version after all tests">
+      <change afterPath="$PROJECT_DIR$/src/test/HistoryManagerTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/4/b/4b79e371f7e9c8916da5a120d27cb271963f33ec" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/4/b/4b79e371f7e9c8916da5a120d27cb271963f33ec" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/a/a/aa928e2b414d2c845d9fdad53e0c5bb8aad86dc4" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/a/a/aa928e2b414d2c845d9fdad53e0c5bb8aad86dc4" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/b/4/b419957f73b662c98cd7b11f28f7382ad08ed6c6" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/b/4/b419957f73b662c98cd7b11f28f7382ad08ed6c6" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/securityhotspotstore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/securityhotspotstore/index.pb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/manager/HistoryManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/manager/HistoryManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/manager/InMemoryTaskManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/manager/InMemoryTaskManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/manager/Managers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/manager/Managers.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/EpicTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/EpicTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +56,8 @@
     "Application.Main.executor": "Run",
     "Application.utils.Main.executor": "Run",
     "Downloaded.Files.Path.Enabled": "true",
-    "JUnit.All in java-kanban.executor": "Coverage",
+    "JUnit.All in java-kanban (1).executor": "Coverage",
+    "JUnit.All in java-kanban.executor": "Run",
     "JUnit.EpicTest.checkSetEpic.executor": "Run",
     "JUnit.EpicTest.executor": "Run",
     "JUnit.EpicTest.getEpic.executor": "Debug",
@@ -53,6 +65,8 @@
     "JUnit.EpicTest.getSubtasks.executor": "Run",
     "JUnit.EpicTest.getSubtasksFromEpic.executor": "Run",
     "JUnit.EpicTest.removeSubtask.executor": "Run",
+    "JUnit.HistoryManagerTest.executor": "Run",
+    "JUnit.HistoryManagerTest.getHistory.executor": "Debug",
     "JUnit.TaskTest.clearTask.executor": "Run",
     "JUnit.TaskTest.executor": "Run",
     "JUnit.addNewTask.executor": "Run",
@@ -90,90 +104,20 @@
       <recent name="model" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.All in java-kanban">
-    <configuration name="All in java-kanban" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+  <component name="RunManager">
+    <configuration name="All in java-kanban" type="JUnit" factoryName="JUnit" temporary="true">
       <module name="java-kanban" />
       <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
       <option name="TEST_OBJECT" value="package" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="EpicTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="java-kanban" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="test.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="test" />
-      <option name="MAIN_CLASS_NAME" value="test.EpicTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="EpicTest.getSubtask" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="java-kanban" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="test.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="test" />
-      <option name="MAIN_CLASS_NAME" value="test.EpicTest" />
-      <option name="METHOD_NAME" value="getSubtask" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="EpicTest.removeSubtask" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="java-kanban" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="test.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="test" />
-      <option name="MAIN_CLASS_NAME" value="test.EpicTest" />
-      <option name="METHOD_NAME" value="removeSubtask" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="test in java-kanban" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="java-kanban" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="test.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="test" />
-      <option name="TEST_OBJECT" value="package" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <list>
-      <item itemvalue="JUnit.All in java-kanban" />
-      <item itemvalue="JUnit.EpicTest.getSubtask" />
-      <item itemvalue="JUnit.EpicTest.removeSubtask" />
-      <item itemvalue="JUnit.test in java-kanban" />
-      <item itemvalue="JUnit.EpicTest" />
-    </list>
     <recent_temporary>
       <list>
         <item itemvalue="JUnit.All in java-kanban" />
-        <item itemvalue="JUnit.test in java-kanban" />
-        <item itemvalue="JUnit.EpicTest" />
-        <item itemvalue="JUnit.EpicTest.removeSubtask" />
-        <item itemvalue="JUnit.EpicTest.getSubtask" />
       </list>
     </recent_temporary>
   </component>
@@ -271,7 +215,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="main" />
+                        <option value="HEAD" />
                       </list>
                     </value>
                   </entry>
@@ -294,5 +238,9 @@
     <SUITE FILE_PATH="coverage/java_kanban$test_in_java_kanban.ic" NAME="test in java-kanban Coverage Results" MODIFIED="1704749324634" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
       <FILTER>test.*</FILTER>
     </SUITE>
+    <SUITE FILE_PATH="coverage/java_kanban$HistoryManagerTest_getHistory.ic" NAME="HistoryManagerTest.getHistory Coverage Results" MODIFIED="1704755825768" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>test.*</FILTER>
+    </SUITE>
+    <SUITE FILE_PATH="coverage/java_kanban$All_in_java_kanban__1_.ic" NAME="All in java-kanban (1) Coverage Results" MODIFIED="1704785552013" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
 </project>

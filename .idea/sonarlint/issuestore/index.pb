@@ -40,3 +40,5 @@ F
 :
 
 .gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
+P
+ src/test/HistoryManagerTest.java,6\b\6bc7f018ebd1cf7cea85e82250543536ae879fb3

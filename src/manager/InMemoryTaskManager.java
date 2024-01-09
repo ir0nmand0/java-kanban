@@ -101,14 +101,6 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public String toString() {
-        return "task.InMemoryTaskManager{" +
-                "tasks=" + tasks +
-                ",\n\t\t\t\tepics=" + epics +
-                '}';
-    }
-
-    @Override
     public List<Task> getTasks() {
         List<Task> tasks = new ArrayList<>();
 
