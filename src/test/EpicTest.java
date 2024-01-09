@@ -1,6 +1,7 @@
 package test;
 import model.*;
 import manager.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -54,8 +55,8 @@ public class EpicTest {
             epic2
     );
 
-
-    private EpicTest() {
+    @BeforeEach
+    public void addToEpicTest() {
         taskManager.setEpic(epic1);
         taskManager.setEpic(epic2);
         taskManager.setSubtask(epic1, subtask1);
@@ -116,10 +117,6 @@ public class EpicTest {
         assertNotNull(savedSubtask6, "Подзадача не найдена.");
         assertEquals(savedSubtask3, subtask3, "Подзадачи не совпадают.");
         assertEquals(savedSubtask6, subtask6, "Подзадачи не совпадают.");
-
-        this.sizeEpics = taskManager.getEpics().size();
-        this.sizeAllSubtasks = taskManager.getSubtasks().size();
-        this.indexEpic = taskManager.getEpics().indexOf(epic1);
     }
 
     @Test

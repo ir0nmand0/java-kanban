@@ -5,18 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="69fc4ede-133c-4e82-988e-f80d85bcaa9f" name="Changes" comment="Final version after all tests">
-      <change afterPath="$PROJECT_DIR$/src/test/HistoryManagerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/4/b/4b79e371f7e9c8916da5a120d27cb271963f33ec" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/4/b/4b79e371f7e9c8916da5a120d27cb271963f33ec" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/7/6/76649bd1d56d95f6a9b84abaffedeae0bc10c5e1" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/7/6/76649bd1d56d95f6a9b84abaffedeae0bc10c5e1" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/a/a/aa928e2b414d2c845d9fdad53e0c5bb8aad86dc4" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/a/a/aa928e2b414d2c845d9fdad53e0c5bb8aad86dc4" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/b/4/b419957f73b662c98cd7b11f28f7382ad08ed6c6" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/b/4/b419957f73b662c98cd7b11f28f7382ad08ed6c6" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/securityhotspotstore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/securityhotspotstore/index.pb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/manager/HistoryManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/manager/HistoryManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/manager/InMemoryHistoryManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/manager/InMemoryHistoryManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/manager/InMemoryTaskManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/manager/InMemoryTaskManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/manager/Managers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/manager/Managers.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/EpicTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/EpicTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/HistoryManagerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/HistoryManagerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/TaskTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/TaskTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,46 +48,46 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.Main.executor": "Run",
-    "Application.utils.Main.executor": "Run",
-    "Downloaded.Files.Path.Enabled": "true",
-    "JUnit.All in java-kanban (1).executor": "Coverage",
-    "JUnit.All in java-kanban.executor": "Run",
-    "JUnit.EpicTest.checkSetEpic.executor": "Run",
-    "JUnit.EpicTest.executor": "Run",
-    "JUnit.EpicTest.getEpic.executor": "Debug",
-    "JUnit.EpicTest.getSubtask.executor": "Run",
-    "JUnit.EpicTest.getSubtasks.executor": "Run",
-    "JUnit.EpicTest.getSubtasksFromEpic.executor": "Run",
-    "JUnit.EpicTest.removeSubtask.executor": "Run",
-    "JUnit.HistoryManagerTest.executor": "Run",
-    "JUnit.HistoryManagerTest.getHistory.executor": "Debug",
-    "JUnit.TaskTest.clearTask.executor": "Run",
-    "JUnit.TaskTest.executor": "Run",
-    "JUnit.addNewTask.executor": "Run",
-    "JUnit.test in java-kanban.executor": "Run",
-    "Repository.Attach.Annotations": "false",
-    "Repository.Attach.JavaDocs": "false",
-    "Repository.Attach.Sources": "false",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "SONARLINT_PRECOMMIT_ANALYSIS": "true",
-    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit5",
-    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5": "",
-    "create.test.in.the.same.root": "true",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_directory_selection": "C:/Users/adm/IdeaProjects/java-kanban/src/test",
-    "last_opened_file_path": "C:/Users/adm/IdeaProjects/wildcard_and_GenericClass",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "Errors"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Application.utils.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;true&quot;,
+    &quot;JUnit.All in java-kanban (1).executor&quot;: &quot;Coverage&quot;,
+    &quot;JUnit.All in java-kanban.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.EpicTest.checkSetEpic.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.EpicTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.EpicTest.getEpic.executor&quot;: &quot;Debug&quot;,
+    &quot;JUnit.EpicTest.getSubtask.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.EpicTest.getSubtasks.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.EpicTest.getSubtasksFromEpic.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.EpicTest.removeSubtask.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.HistoryManagerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.HistoryManagerTest.getHistory.executor&quot;: &quot;Debug&quot;,
+    &quot;JUnit.TaskTest.clearTask.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.TaskTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.addNewTask.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.test in java-kanban.executor&quot;: &quot;Run&quot;,
+    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;SONARLINT_PRECOMMIT_ANALYSIS&quot;: &quot;true&quot;,
+    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary&quot;: &quot;JUnit5&quot;,
+    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5&quot;: &quot;&quot;,
+    &quot;create.test.in.the.same.root&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_directory_selection&quot;: &quot;C:/Users/adm/IdeaProjects/java-kanban/src/test&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/adm/IdeaProjects/wildcard_and_GenericClass&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;Errors&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CreateTestDialog.Recents.Supers">
       <recent name="" />

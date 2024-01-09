@@ -27,7 +27,8 @@ public class HistoryManagerTest {
             epic1
     );
 
-     private HistoryManagerTest() {
+    @BeforeEach
+     public void addToHistoryManagerTest() {
         taskManager.setTask(task1);
         allHistory.add(task1);
         taskManager.setTask(task2);

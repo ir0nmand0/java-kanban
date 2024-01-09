@@ -1,6 +1,7 @@
 package test;
 import model.*;
 import manager.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -15,7 +16,8 @@ public class TaskTest {
     private Integer sizeTasks;
     private Integer indexTask;
 
-    private TaskTest() {
+    @BeforeEach
+    public void addTotaskTest() {
         taskManager.setTask(task1);
         taskManager.setTask(task3);
         this.sizeTasks = taskManager.getTasks().size();

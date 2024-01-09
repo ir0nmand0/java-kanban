@@ -91,24 +91,12 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Epic> getEpics() {
-        List<Epic> tasks = new ArrayList<>();
-
-        for (Map.Entry<Integer, Epic> entry : this.epics.entrySet()) {
-            tasks.add(entry.getValue());
-        }
-
-        return tasks;
+        return new ArrayList<>(epics.values());
     }
 
     @Override
     public List<Task> getTasks() {
-        List<Task> tasks = new ArrayList<>();
-
-        for (Map.Entry<Integer, Task> entry : this.tasks.entrySet()) {
-            tasks.add(entry.getValue());
-        }
-
-        return tasks;
+        return new ArrayList<>(tasks.values());
     }
 
     @Override
