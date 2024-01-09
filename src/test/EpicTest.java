@@ -173,7 +173,6 @@ public class EpicTest {
 
     @Test
     public void clearEpics() {
-
         taskManager.clearEpics();
 
         final List<Epic> epics = taskManager.getEpics();
