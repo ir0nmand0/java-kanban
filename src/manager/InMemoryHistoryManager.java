@@ -1,25 +1,34 @@
 package manager;
 import model.Task;
-import java.util.LinkedList;
-import java.util.List;
+
+import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    //За подсказку с O(1) спасибо, а про связанные списки забыл, хотя и писал их когда-то на c++
-    private final List<Task> history = new LinkedList<>();
+    private final Map<Integer, Task> history = new LinkedHashMap<>();
 
     public void add(Task task) {
-        removeFromHistory();
-        history.add(task);
+        remove(task);
+        history.put(task.getId(), task);
     }
 
     public List<Task> getHistory() {
-        return history;
+        return new ArrayList<>(history.values());
     }
 
-    private void removeFromHistory() {
-        if (history.size() == 10) {
-            history.remove(0);
+    public void remove(Task task) {
+        if (!history.containsKey(task.getId())) {
+            return;
         }
+
+        history.remove(task.getId());
+    }
+
+    public void remove(int id) {
+        if (!history.containsKey(id)) {
+            return;
+        }
+
+        history.remove(id);
     }
 
 }

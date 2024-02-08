@@ -10,10 +10,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class HistoryManagerTest {
     private final TaskManager taskManager = Managers.getDefault();
+    private final HistoryManager historyManager = Managers.getDefaultHistory();
     private final Task task1 = new Task("Task1 TaskTest", "TaskTest1 description", Status.NEW);
     private final Task task2 = new Task("Task2 TaskTest", "TaskTest2 description", Status.IN_PROGRESS);
     private final Epic epic1 = new Epic("Epic EpicTest1", "EpicTest1 description");
-    private final List<Task> allHistory = new ArrayList<>();
+    private static final List<Task> allHistory = new ArrayList<>();
     private final Subtask subtask1 = new Subtask(
             "Subtask Subtask1",
             "Subtask1 description",
@@ -52,6 +53,17 @@ public class HistoryManagerTest {
 
         assertNotEquals(history.size(), 0, "История задач не получена");
         assertEquals(history, allHistory, "Истории задач не равны");
+    }
+
+    @Test
+    public void remove() {
+        historyManager.remove(task1.getId());
+        allHistory.remove(task1);
+
+        final List<Task> history = taskManager.getHistory();
+
+        assertEquals(history.size(), allHistory.size(), "Задача не удалена");
+        assertEquals(history, allHistory, "Задача не удалена");
     }
 
 }
