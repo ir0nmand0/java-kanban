@@ -9,27 +9,35 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HistoryManagerTest {
-    private final TaskManager taskManager = Managers.getDefault();
-    private final HistoryManager historyManager = Managers.getDefaultHistory();
-    private final Task task1 = new Task("Task1 TaskTest", "TaskTest1 description", Status.NEW);
-    private final Task task2 = new Task("Task2 TaskTest", "TaskTest2 description", Status.IN_PROGRESS);
-    private final Epic epic1 = new Epic("Epic EpicTest1", "EpicTest1 description");
-    private static final List<Task> allHistory = new ArrayList<>();
-    private final Subtask subtask1 = new Subtask(
-            "Subtask Subtask1",
-            "Subtask1 description",
-            Status.NEW,
-            epic1
-    );
-    private final Subtask subtask2 = new Subtask(
-            "Subtask Subtask2",
-            "Subtask2 description",
-            Status.IN_PROGRESS,
-            epic1
-    );
+    private static TaskManager taskManager;
+    private static HistoryManager historyManager;
+    private static Task task1;
+    private static Task task2;
+    private static Epic epic1;
+    private static List<Task> allHistory;
+    private static Subtask subtask1;
+    private static Subtask subtask2;
 
-    @BeforeEach
-     public void addToHistoryManagerTest() {
+    @BeforeAll
+    public static void firstInit() {
+        taskManager = Managers.getDefault();
+        historyManager = Managers.getDefaultHistory();
+        task1 = new Task("Task1 TaskTest", "TaskTest1 description", Status.NEW);
+        task2 = new Task("Task2 TaskTest", "TaskTest2 description", Status.IN_PROGRESS);
+        epic1 = new Epic("Epic EpicTest1", "EpicTest1 description");
+        allHistory = new ArrayList<>();
+        subtask1 = new Subtask(
+                "Subtask Subtask1",
+                "Subtask1 description",
+                Status.NEW,
+                epic1
+        );
+        subtask2 = new Subtask(
+                "Subtask Subtask2",
+                "Subtask2 description",
+                Status.IN_PROGRESS, epic1
+        );
+
         taskManager.setTask(task1);
         allHistory.add(task1);
         taskManager.setTask(task2);

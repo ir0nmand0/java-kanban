@@ -1,21 +1,77 @@
 package manager;
 import model.Task;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private final Map<Integer, Task> history = new LinkedHashMap<>();
+
+    private Node head;
+    private Node tail;
+
+    //Реализовал связанный список с мапой, можно было обойтись односвязным, но решил попрактиковаться
+    private final Map<Integer, Node> history = new HashMap<>();
 
     public void add(Task task) {
-        remove(task);
-        history.put(task.getId(), task);
+        if (head != null && tail.getTask().getId() == task.getId()) {
+            return;
+        }
+
+        if (history.containsKey(task.getId())) {
+            removeNode(history.get(task.getId()));
+        }
+
+        Node node = new Node(task);
+
+        if (head == null) {
+            head = node;
+        } else {
+            tail.setNext(node);
+        }
+
+        node.setPrev(tail);
+        tail = node;
+        history.put(task.getId(), node);
+    }
+
+    private void removeNode(Node node) {
+        if (head == null) {
+            return;
+        }
+
+        Node next = node.getNext();
+        Node prev = node.getPrev();
+
+        if (next != null) {
+            next.setPrev(prev);
+        }
+
+        if (prev != null) {
+            prev.setNext(next);
+        }
+
+        if (head == node) {
+            head = next;
+        }
+
+        if (tail == node) {
+            tail = prev;
+        }
     }
 
     public List<Task> getHistory() {
-        return new ArrayList<>(history.values());
+        if (head == null) {
+            new ArrayList<>();
+        }
+
+        List<Task> list = new ArrayList<>();
+        for (Node node = head; node != null; node = node.getNext()) {
+            list.add(node.getTask());
+        }
+
+        return list;
     }
 
     public void remove(Task task) {
@@ -23,6 +79,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             return;
         }
 
+        removeNode(history.get(task.getId()));
         history.remove(task.getId());
     }
 
@@ -31,6 +88,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             return;
         }
 
+        removeNode(history.get(id));
         history.remove(id);
     }
 
