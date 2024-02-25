@@ -15,7 +15,7 @@ public class EpicTest {
     private Integer indexSubtaskFromAllEpics;
     private Integer indexSubtaskFromOneEpic;
     private Integer sizeSubtasks;
-    private final TaskManager taskManager = Managers.getDefault();
+    private final TaskManager taskManager = Managers.getTaskManager();
     private final Epic epic1 = new Epic("Epic EpicTest1", "EpicTest1 description");
     private final Epic epic2 = new Epic("Epic EpicTest2", "EpicTest2 description");
     private final Subtask subtask1 = new Subtask(
@@ -57,12 +57,12 @@ public class EpicTest {
 
     @BeforeEach
     public void addToEpicTest() {
-        taskManager.setEpic(epic1);
-        taskManager.setEpic(epic2);
-        taskManager.setSubtask(epic1, subtask1);
-        taskManager.setSubtask(epic1, subtask2);
-        taskManager.setSubtask(epic2, subtask4);
-        taskManager.setSubtask(epic2, subtask5);
+        taskManager.addEpic(epic1);
+        taskManager.addEpic(epic2);
+        taskManager.addSubtask(epic1, subtask1);
+        taskManager.addSubtask(epic1, subtask2);
+        taskManager.addSubtask(epic2, subtask4);
+        taskManager.addSubtask(epic2, subtask5);
 
         this.sizeEpics = taskManager.getEpics().size();
         this.indexEpic = taskManager.getEpics().indexOf(epic1);
@@ -73,7 +73,7 @@ public class EpicTest {
     }
 
     @Test
-    public void checkSetEpic() {
+    public void addEpic() {
         final Integer epicId = epic1.getId();
         final Epic savedEpic = taskManager.getEpic(epicId);
 
@@ -82,7 +82,7 @@ public class EpicTest {
     }
 
     @Test
-    public void checkSetSubtask() {
+    public void addSubtask() {
         final Integer subtaskId2 = subtask2.getId();
         final Integer subtaskId5 = subtask5.getId();
         final Subtask savedSubtask2 = taskManager.getSubtask(subtaskId2);

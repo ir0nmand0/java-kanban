@@ -2,3 +2,5 @@
 out/
 !lib/
 *.iml
+*.csv
+*.txt

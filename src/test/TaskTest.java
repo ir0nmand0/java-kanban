@@ -4,12 +4,11 @@ import manager.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TaskTest {
-    private final TaskManager taskManager = Managers.getDefault();
+    private final TaskManager taskManager = Managers.getTaskManager();
     private final Task task1 = new Task("Task1 TaskTest", "TaskTest1 description", Status.NEW);
     private final Task task2 = new Task("Task2 TaskTest", "TaskTest2 description", Status.IN_PROGRESS);
     private final Task task3 = new Task("Task3 TaskTest", "TaskTest3 description", Status.NEW);
@@ -18,16 +17,16 @@ public class TaskTest {
 
     @BeforeEach
     public void addTotaskTest() {
-        taskManager.setTask(task1);
-        taskManager.setTask(task3);
+        taskManager.addTask(task1);
+        taskManager.addTask(task3);
         this.sizeTasks = taskManager.getTasks().size();
         this.indexTask = taskManager.getTasks().indexOf(task1);
     }
 
     @Test
-    public void checkSetTask() {
+    public void checkAddTask() {
 
-        taskManager.setTask(task1);
+        taskManager.addTask(task1);
 
         final int taskId = task1.getId();
         final Task savedTask = taskManager.getTask(taskId);

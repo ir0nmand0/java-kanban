@@ -7,89 +7,97 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class InMemoryHistoryManager implements HistoryManager {
+    private InMemoryNode<Task> inMemoryNode;
+    private Map<Integer, Node<Task>> history;
 
-    private Node head;
-    private Node tail;
+    public InMemoryHistoryManager() {
+        inMemoryNode = new InMemoryNode<>();
+        history = new HashMap<>();
+    }
 
-    //Реализовал связанный список с мапой, можно было обойтись односвязным, но решил попрактиковаться
-    private final Map<Integer, Node> history = new HashMap<>();
+    public InMemoryHistoryManager(final InMemoryNode<Task> inMemoryNode, final Map<Integer, Node<Task>> history) {
+        load(inMemoryNode, history);
+    }
 
+    @Override
+    public void load(final InMemoryNode<Task> inMemoryNode, final Map<Integer, Node<Task>> history) {
+        this.inMemoryNode = inMemoryNode;
+        this.history = history;
+    }
+
+    @Override
     public void add(Task task) {
-        if (head != null && tail.getTask().getId() == task.getId()) {
+        if (history.containsKey(task.getId())) {
+            inMemoryNode.remove(history.get(task.getId()));
+        }
+
+        Node<Task> node = inMemoryNode.add(task);
+
+        if (node == null) {
             return;
         }
 
-        if (history.containsKey(task.getId())) {
-            removeNode(history.get(task.getId()));
-        }
-
-        Node node = new Node(task);
-
-        if (head == null) {
-            head = node;
-        } else {
-            tail.setNext(node);
-        }
-
-        node.setPrev(tail);
-        tail = node;
         history.put(task.getId(), node);
     }
 
-    private void removeNode(Node node) {
-        if (head == null) {
-            return;
-        }
-
-        Node next = node.getNext();
-        Node prev = node.getPrev();
-
-        if (next != null) {
-            next.setPrev(prev);
-        }
-
-        if (prev != null) {
-            prev.setNext(next);
-        }
-
-        if (head == node) {
-            head = next;
-        }
-
-        if (tail == node) {
-            tail = prev;
-        }
-    }
-
+    @Override
     public List<Task> getHistory() {
-        if (head == null) {
-            new ArrayList<>();
+        List<Task> list = new ArrayList<>();
+
+        if (inMemoryNode.getHead() == null) {
+            return list;
         }
 
-        List<Task> list = new ArrayList<>();
-        for (Node node = head; node != null; node = node.getNext()) {
+        for (Node<Task> node = inMemoryNode.getHead(); node != null; node = node.getNext()) {
             list.add(node.getTask());
         }
 
         return list;
     }
 
+    @Override
     public void remove(Task task) {
         if (!history.containsKey(task.getId())) {
             return;
         }
 
-        removeNode(history.get(task.getId()));
+        inMemoryNode.remove(history.get(task.getId()));
         history.remove(task.getId());
     }
 
+    @Override
     public void remove(int id) {
         if (!history.containsKey(id)) {
             return;
         }
 
-        removeNode(history.get(id));
+        inMemoryNode.remove(history.get(id));
         history.remove(id);
     }
 
+    @Override
+    public void clear() {
+        inMemoryNode.clear();
+        history.clear();
+    }
+
+    @Override
+    public void clear(Map<Integer,? extends Task> map) {
+        for (Map.Entry<Integer,? extends Task> entry : map.entrySet()) {
+            if (history.containsKey(entry.getKey())) {
+                remove(entry.getKey());
+            }
+        }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (Task task : getHistory()) {
+            stringBuilder.append(String.format("%d,", task.getId()));
+        }
+
+        return stringBuilder.toString();
+    }
 }

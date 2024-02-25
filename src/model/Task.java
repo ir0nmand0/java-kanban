@@ -1,4 +1,6 @@
 package model;
+import manager.ManagerSaveException;
+
 import java.util.Objects;
 
 public class Task {
@@ -15,6 +17,13 @@ public class Task {
         this.mainId = getNewId();
     }
 
+    public Task(Integer id, String name, String description, Status status) {
+        this.mainId = id;
+        this.name = name;
+        this.description = description;
+        this.status = status;
+    }
+
     public Status getStatus() {
         return status;
     }
@@ -28,23 +37,17 @@ public class Task {
                 && status == task.status && Objects.equals(mainId, task.mainId);
     }
 
-    private static Integer getNewId() {
-        if (newId == Integer.MAX_VALUE) {
-            return 0;
+    private static Integer getNewId() throws ManagerSaveException {
+        if (newId == Integer.MAX_VALUE || newId < 0) {
+            throw new ManagerSaveException("Не допустимый ID для задачи");
         }
 
         return newId++;
     }
 
-
     @Override
     public String toString() {
-        return "TaskTest{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", id=" + mainId +
-                ", status=" + status +
-                '}';
+        return String.format("%d;%s;%s;%s;%s;", mainId, getClass().getSimpleName(), name, status, description);
     }
 
     @Override
