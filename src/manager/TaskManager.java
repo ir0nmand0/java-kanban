@@ -1,20 +1,27 @@
 package manager;
 import model.*;
 import java.util.List;
+import java.util.Map;
 
 public interface TaskManager {
 
-    void setTask(Task task);
+    void loadTask();
 
-    void setSubtask(Epic epic, Subtask subtask);
+    void loadHistory();
 
-    void setEpic(Epic epic);
+    void addTask(Task task);
+
+    void addSubtask(Epic epic, Subtask subtask);
+
+    void addEpic(Epic epic);
 
     void updateTask(Task oldTask, Task task);
 
     void updateSubtask(Epic epic, Subtask oldSubtask, Subtask subtask);
 
     Task getTask(Integer id);
+
+    Map<Integer, Epic> getMapEpics();
 
     List<Task> getTasks();
 
@@ -32,6 +39,10 @@ public interface TaskManager {
 
     void removeSubtask(Integer idSubtask);
 
+    boolean containsKeyInEpics(int id);
+
+    boolean containsKeyInTasks(int id);
+
     void removeEpic(Integer id);
 
     void removeEpic(Epic epic);
@@ -47,7 +58,4 @@ public interface TaskManager {
     List<Subtask> getSubtasks(Integer idEpic);
 
     List<Subtask> getSubtasks(Epic epic);
-
-    List<Task> getHistory();
-
 }

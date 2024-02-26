@@ -1,20 +1,24 @@
 package model;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Epic extends Task {
 
-    private final Map <Integer, Subtask> subtasks = new HashMap<>();
+    private final Map <Integer, Subtask> subtasks = new LinkedHashMap<>();
 
     public Epic(String name, String description) {
         super(name, description, Status.NEW);
     }
 
-    public Map<Integer, Subtask> getSubtasks() {
+    public Epic(Integer id, String name, String description) {
+        super(id, name, description, Status.NEW);
+    }
+
+    public Map<Integer, Subtask> getMapSubtasks() {
         return subtasks;
     }
 
-    public void setSubtask(Subtask subtask) {
+    public void addSubtask(Subtask subtask) {
         Integer taskId = subtask.getId();
 
         if (subtasks.containsKey(taskId)) {
@@ -22,6 +26,16 @@ public class Epic extends Task {
         }
 
         subtasks.put(taskId, subtask);
+        updateStatus();
+    }
+
+    public void addSubtask(Integer id, Subtask subtask) {
+
+        if (subtasks.containsKey(id)) {
+            return;
+        }
+
+        subtasks.put(id, subtask);
         updateStatus();
     }
 
@@ -62,12 +76,5 @@ public class Epic extends Task {
         } else {
             status = Status.IN_PROGRESS;
         }
-    }
-
-    @Override
-    public String toString() {
-        return "Epic{" +
-                "subtasks=" + subtasks +
-                '}';
     }
 }

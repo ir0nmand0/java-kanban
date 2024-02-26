@@ -20,8 +20,9 @@ public class HistoryManagerTest {
 
     @BeforeAll
     public static void firstInit() {
-        taskManager = Managers.getDefault();
-        historyManager = Managers.getDefaultHistory();
+        historyManager = Managers.getHistoryManager();
+        taskManager = Managers.getTaskManager();
+        historyManager.clear();
         task1 = new Task("Task1 TaskTest", "TaskTest1 description", Status.NEW);
         task2 = new Task("Task2 TaskTest", "TaskTest2 description", Status.IN_PROGRESS);
         epic1 = new Epic("Epic EpicTest1", "EpicTest1 description");
@@ -38,15 +39,15 @@ public class HistoryManagerTest {
                 Status.IN_PROGRESS, epic1
         );
 
-        taskManager.setTask(task1);
+        taskManager.addTask(task1);
         allHistory.add(task1);
-        taskManager.setTask(task2);
+        taskManager.addTask(task2);
         allHistory.add(task2);
-        taskManager.setEpic(epic1);
+        taskManager.addEpic(epic1);
         allHistory.add(epic1);
-        taskManager.setSubtask(epic1, subtask1);
+        taskManager.addSubtask(epic1, subtask1);
         allHistory.add(subtask1);
-        taskManager.setSubtask(epic1, subtask2);
+        taskManager.addSubtask(epic1, subtask2);
         allHistory.add(subtask2);
         taskManager.getTask(task1.getId());
         taskManager.getTask(task2.getId());
@@ -57,7 +58,7 @@ public class HistoryManagerTest {
 
     @Test
     public void getHistory() {
-        final List<Task> history = taskManager.getHistory();
+        final List<Task> history = historyManager.getHistory();
 
         assertNotEquals(history.size(), 0, "История задач не получена");
         assertEquals(history, allHistory, "Истории задач не равны");
@@ -68,7 +69,7 @@ public class HistoryManagerTest {
         historyManager.remove(task1.getId());
         allHistory.remove(task1);
 
-        final List<Task> history = taskManager.getHistory();
+        final List<Task> history = historyManager.getHistory();
 
         assertEquals(history.size(), allHistory.size(), "Задача не удалена");
         assertEquals(history, allHistory, "Задача не удалена");
