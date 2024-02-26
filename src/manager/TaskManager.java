@@ -5,7 +5,7 @@ import java.util.Map;
 
 public interface TaskManager {
 
-    void loadTask() throws ManagerSaveException;
+    void loadTask();
 
     void loadHistory();
 

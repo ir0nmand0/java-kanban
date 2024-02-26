@@ -34,7 +34,7 @@ public class FileBackedTaskManager implements TaskManager {
         return Files.exists(pathFile) && !Files.isDirectory(pathFile);
     }
 
-    private void saveTask() throws ManagerSaveException {
+    private void saveTask() {
         try (Writer fileWriter = new FileWriter(nameBackedTaskManager, StandardCharsets.UTF_8, false)) {
             fileWriter.write(String.format("%s%n", head));
 
@@ -55,7 +55,7 @@ public class FileBackedTaskManager implements TaskManager {
         }
     }
 
-    private void saveHistory() throws ManagerSaveException {
+    private void saveHistory() {
         if (historyManager.getHistory().isEmpty()) {
             return;
         }
@@ -69,16 +69,25 @@ public class FileBackedTaskManager implements TaskManager {
         }
     }
 
-    private Status getStatus(final String string) throws ManagerSaveException {
+    private Status getStatus(final String string) {
         return switch (string.trim().toLowerCase()) {
             case "new" -> Status.NEW;
             case "in_progress" -> Status.IN_PROGRESS;
             case "done" -> Status.DONE;
-            default -> throw new ManagerSaveException("не соответсвует ни одному из типов статуса задач");
+            default -> throw new RuntimeException("не соответсвует ни одному из типов статуса задач");
         };
     }
 
-    private List<String> read(String nameFile) throws ManagerSaveException {
+    private String getType(final String string) {
+        return switch (string.trim().toLowerCase()) {
+            case "task" -> Task.class.getSimpleName().toLowerCase();
+            case "epic" -> Epic.class.getSimpleName().toLowerCase();
+            case "subtask" -> Subtask.class.getSimpleName().toLowerCase();
+            default -> throw new RuntimeException("не соответсвует ни одному из типов задач");
+        };
+    }
+
+    private List<String> read(String nameFile) {
         List<String> read = new ArrayList<>();
 
         Path pathFile = Paths.get(nameFile);
@@ -93,14 +102,14 @@ public class FileBackedTaskManager implements TaskManager {
                 }
             }
         } catch (IOException e) {
-            throw new ManagerSaveException(e);
+            throw new ManagerReadException(e);
         }
 
         return read;
     }
 
     @Override
-    public void loadTask() throws ManagerSaveException {
+    public void loadTask() {
         Map<Integer, List<String>> tmpTask = new LinkedHashMap<>();
 
         for (String string : read(nameBackedTaskManager)) {
@@ -124,23 +133,22 @@ public class FileBackedTaskManager implements TaskManager {
 
         for (Map.Entry<Integer, List<String>> entry : tmpTask.entrySet()) {
             List<String> list = entry.getValue();
-            Integer id = entry.getKey();
+            final Integer id = entry.getKey();
+            final String type = getType(list.get(1));
+            final String name =  list.get(2);
+            final String description = list.get(4);
+            final Status status = getStatus(list.get(3));
 
-            switch (list.get(1).trim().toLowerCase()) {
-                case "task": {
-                    taskManager.addTask(new Task(id, list.get(2), list.get(4), getStatus(list.get(3))));
-                    break;
+            switch (type) {
+                case "task" -> {
+                    taskManager.addTask(new Task(id, name, description, status));
                 }
-                case "epic": {
-                    taskManager.addEpic(new Epic(id, list.get(2), list.get(4)));
-                    break;
+                case "epic" -> {
+                    taskManager.addEpic(new Epic(id, name, description));
                 }
-                case "subtask": {
+                case "subtask" -> {
                     subtasks.put(id, list);
-                    break;
                 }
-                default:
-                    throw new ManagerSaveException("Тип задачи не распознан");
             }
         }
 
@@ -151,19 +159,22 @@ public class FileBackedTaskManager implements TaskManager {
                 int epicId = Integer.parseInt(list.getLast().trim());
 
                 if (!containsKeyInEpics(epicId)) {
-                    throw new ManagerSaveException(String.format(
+                    throw new ManagerReadException(String.format(
                             "ID-%d эпика в подзадаче не соответствует", epicId)
                     );
                 }
 
-                Epic epic = taskManager.getEpic(epicId);
+                final Epic epic = taskManager.getEpic(epicId);
+                final String name =  list.get(2);
+                final String description = list.get(4);
+                final Status status = getStatus(list.get(3));
 
-                epic.addSubtask(new Subtask(id, list.get(2),
-                        list.get(4), getStatus(list.get(3)), epic));
+                epic.addSubtask(new Subtask(id, name,
+                        description, status, epic));
             } catch (NumberFormatException e) {
-                throw e.getMessage() != null ? new ManagerSaveException(String.format(
+                throw e.getMessage() != null ? new ManagerReadException(String.format(
                         "%s и нет id эпика", e.getMessage()))
-                        : new ManagerSaveException("нет id эпика");
+                        : new ManagerReadException("нет id эпика");
             }
         }
     }
@@ -173,20 +184,27 @@ public class FileBackedTaskManager implements TaskManager {
         List<Integer> idHistory = new ArrayList<>();
 
         for (String string : read(nameHistoryManager)) {
-            List<String> list = new ArrayList<>(Arrays.asList(string.split(",")));
+            if (!idHistory.isEmpty()) {
+                break;
+            } else if (string.isEmpty()) {
+                continue;
+            }
 
-            try {
-                if (!list.isEmpty() && idHistory.isEmpty()
-                        && list.getFirst().trim().compareToIgnoreCase(fieldHistory) >= 0) {
+            List<String> list = new ArrayList<>(Arrays.asList(string.split(",")));
+            final String possibleHeader =  list.getFirst().trim();
+
+            if (possibleHeader.compareToIgnoreCase(fieldHistory) >= 0) {
+                try {
+                    //Разбираем строку с содержимым fieldHistory[0-9] и извлекаем сразу первый элемент после :
                     idHistory.add(Integer.parseInt(list.getFirst().split(":")[1]));
 
                     for (int i = 1; i < list.size(); ++i) {
                         idHistory.add(Integer.parseInt(list.get(i)));
                     }
 
+                } catch (NumberFormatException e) {
+                    //Игнорируем все, кроме чисел
                 }
-            } catch (NumberFormatException e) {
-                //Игнорируем все, кроме чисел
             }
 
             historyManager.clear();

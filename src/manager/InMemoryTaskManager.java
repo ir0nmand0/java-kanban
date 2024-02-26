@@ -24,7 +24,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void loadTask() throws ManagerSaveException {
+    public void loadTask() {
         Managers.getFileBackedTaskManager().loadTask();
     }
 
