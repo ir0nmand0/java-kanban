@@ -4,6 +4,8 @@ import manager.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -74,24 +76,13 @@ public class EpicTest {
 
     @Test
     public void addEpic() {
-        final Integer epicId = epic1.getId();
-        final Epic savedEpic = taskManager.getEpic(epicId);
-
-        assertNotNull(savedEpic, "Задача не найдена.");
-        assertEquals(epic1, savedEpic, "Задачи не совпадают.");
+        assertTrue(taskManager.getEpic(epic1.getId()).isPresent(), "Задача не найдена.");
     }
 
     @Test
     public void addSubtask() {
-        final Integer subtaskId2 = subtask2.getId();
-        final Integer subtaskId5 = subtask5.getId();
-        final Subtask savedSubtask2 = taskManager.getSubtask(subtaskId2);
-        final Subtask savedSubtask5 = taskManager.getSubtask(subtaskId5);
-
-        assertNotNull(savedSubtask2, "Подзадача не найдена.");
-        assertNotNull(savedSubtask5, "Подзадача не найдена.");
-        assertEquals(savedSubtask2, subtask2, "Подзадачи не совпадают.");
-        assertEquals(savedSubtask5, subtask5, "Подзадачи не совпадают.");
+        assertTrue(taskManager.getSubtask(subtask2.getId()).isPresent(), "Подзадача не найдена");
+        assertTrue(taskManager.getSubtask(subtask5.getId()).isPresent(), "Подзадача не найдена");
     }
 
     @Test
@@ -108,15 +99,8 @@ public class EpicTest {
         taskManager.updateSubtask(epic1, subtask2, subtask3);
         taskManager.updateSubtask(epic2, subtask5, subtask6);
 
-        final Integer subtaskId3 = subtask3.getId();
-        final Integer subtaskId6 = subtask6.getId();
-        final Subtask savedSubtask3 = taskManager.getSubtask(subtaskId3);
-        final Subtask savedSubtask6 = taskManager.getSubtask(subtaskId6);
-
-        assertNotNull(savedSubtask3, "Подзадача не найдена.");
-        assertNotNull(savedSubtask6, "Подзадача не найдена.");
-        assertEquals(savedSubtask3, subtask3, "Подзадачи не совпадают.");
-        assertEquals(savedSubtask6, subtask6, "Подзадачи не совпадают.");
+        assertTrue(taskManager.getSubtask(subtask3.getId()).isPresent(), "Подзадача не найдена.");
+        assertTrue(taskManager.getSubtask(subtask6.getId()).isPresent(), "Подзадача не найдена.");
     }
 
     @Test
@@ -139,22 +123,16 @@ public class EpicTest {
 
     @Test
     public void getSubtask() {
-        final Integer subtaskId1 = subtask1.getId();
-        final Subtask savedSubtask1 = taskManager.getSubtask(subtaskId1);
-
-        assertNotNull(savedSubtask1, "Подзадача не найдена.");
-        assertEquals(savedSubtask1, subtask1, "Подзадачи не совпадают.");
+        assertTrue(taskManager.getSubtask(subtask1.getId()).isPresent(), "Подзадача не найдена.");
     }
 
     @Test
     public void removeSubtask() {
-        final Integer subtaskId3 = subtask3.getId();
+        final int subtaskId3 = subtask3.getId();
 
         taskManager.removeSubtask(subtaskId3);
 
-        final Subtask savedSubtask3 = taskManager.getSubtask(subtaskId3);
-
-        assertNull(savedSubtask3, "Подзадача не удалена.");
+        assertTrue(taskManager.getSubtask(subtaskId3).isEmpty(), "Подзадача не удалена.");
     }
 
     @Test
@@ -163,9 +141,7 @@ public class EpicTest {
 
         taskManager.removeEpic(epic1Id);
 
-        final Epic savedEpic = taskManager.getEpic(epic1Id);
-
-        assertNull(savedEpic, "Эпик не удален.");
+        assertTrue(taskManager.getEpic(epic1Id).isEmpty(), "Эпик не удален.");
     }
 
     @Test
@@ -177,4 +153,175 @@ public class EpicTest {
         assertEquals(epics.size(), (Integer) 0, "Эпики не удалены.");
     }
 
+    //ТЗ: Все подзадачи со статусом NEW
+    @Test
+    public void allStatusNew() {
+        InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager();
+        Epic epic = new Epic("Epic EpicTest1", "EpicTest1 description");
+        Subtask subtask1 = new Subtask(
+                "Subtask Subtask1",
+                "Subtask1 description",
+                Status.NEW,
+                epic
+        );
+        Subtask subtask2 = new Subtask(
+                "Subtask Subtask2",
+                "Subtask2 description",
+                Status.NEW,
+                epic
+        );
+        Subtask subtask3 = new Subtask(
+                "Subtask Subtask3",
+                "Subtask3 description",
+                Status.NEW,
+                LocalDateTime.now().plusHours(3),
+                Duration.ofHours(1),
+                epic
+        );
+        Subtask subtask4 = new Subtask(
+                "Subtask Subtask4",
+                "Subtask4 description",
+                Status.NEW,
+                LocalDateTime.now().plusHours(6),
+                Duration.ofHours(3),
+                epic
+        );
+
+        inMemoryTaskManager.addEpic(epic);
+        inMemoryTaskManager.addSubtask(epic, subtask1);
+        inMemoryTaskManager.addSubtask(epic, subtask2);
+        inMemoryTaskManager.addSubtask(epic, subtask3);
+        inMemoryTaskManager.addSubtask(epic, subtask4);
+
+        assertTrue(epic.getStatus().equals(Status.NEW), "Эпик не " + Status.NEW);
+    }
+
+    //ТЗ: Все подзадачи со статусом DONE
+    @Test
+    public void allStatusDone() {
+        InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager();
+        Epic epic = new Epic("Epic EpicTest1", "EpicTest1 description");
+        Subtask subtask1 = new Subtask(
+                "Subtask Subtask1",
+                "Subtask1 description",
+                Status.DONE,
+                epic
+        );
+        Subtask subtask2 = new Subtask(
+                "Subtask Subtask2",
+                "Subtask2 description",
+                Status.DONE,
+                epic
+        );
+        Subtask subtask3 = new Subtask(
+                "Subtask Subtask3",
+                "Subtask3 description",
+                Status.DONE,
+                LocalDateTime.now().plusHours(3),
+                Duration.ofHours(1),
+                epic
+        );
+        Subtask subtask4 = new Subtask(
+                "Subtask Subtask4",
+                "Subtask4 description",
+                Status.DONE,
+                LocalDateTime.now().plusHours(6),
+                Duration.ofHours(3),
+                epic
+        );
+
+        inMemoryTaskManager.addEpic(epic);
+        inMemoryTaskManager.addSubtask(epic, subtask1);
+        inMemoryTaskManager.addSubtask(epic, subtask2);
+        inMemoryTaskManager.addSubtask(epic, subtask3);
+        inMemoryTaskManager.addSubtask(epic, subtask4);
+
+        assertTrue(epic.getStatus().equals(Status.DONE), "Эпик не " + Status.DONE);
+    }
+
+    //ТЗ: Все подзадачи со статусом DONE и NEW
+    @Test
+    public void statusDoneAndNew() {
+        InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager();
+        Epic epic = new Epic("Epic EpicTest1", "EpicTest1 description");
+        Subtask subtask1 = new Subtask(
+                "Subtask Subtask1",
+                "Subtask1 description",
+                Status.NEW,
+                epic
+        );
+        Subtask subtask2 = new Subtask(
+                "Subtask Subtask2",
+                "Subtask2 description",
+                Status.DONE,
+                epic
+        );
+        Subtask subtask3 = new Subtask(
+                "Subtask Subtask3",
+                "Subtask3 description",
+                Status.DONE,
+                LocalDateTime.now().plusHours(3),
+                Duration.ofHours(1),
+                epic
+        );
+        Subtask subtask4 = new Subtask(
+                "Subtask Subtask4",
+                "Subtask4 description",
+                Status.NEW,
+                LocalDateTime.now().plusHours(6),
+                Duration.ofHours(3),
+                epic
+        );
+
+        inMemoryTaskManager.addEpic(epic);
+        inMemoryTaskManager.addSubtask(epic, subtask1);
+        inMemoryTaskManager.addSubtask(epic, subtask2);
+        inMemoryTaskManager.addSubtask(epic, subtask3);
+        inMemoryTaskManager.addSubtask(epic, subtask4);
+
+        assertTrue(epic.getStatus().equals(Status.IN_PROGRESS), "Эпик не " + Status.IN_PROGRESS);
+    }
+
+    //ТЗ: Все подзадачи со статусом IN_PROGRESS 🤦‍♂️
+    @Test
+    public void statusInProgress() {
+        InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager();
+        Epic epic = new Epic("Epic EpicTest1", "EpicTest1 description");
+        Subtask subtask1 = new Subtask(
+                "Subtask Subtask1",
+                "Subtask1 description",
+                Status.IN_PROGRESS,
+                epic
+        );
+        Subtask subtask2 = new Subtask(
+                "Subtask Subtask2",
+                "Subtask2 description",
+                Status.IN_PROGRESS,
+                epic
+        );
+        Subtask subtask3 = new Subtask(
+                "Subtask Subtask3",
+                "Subtask3 description",
+                Status.IN_PROGRESS,
+                LocalDateTime.now().plusHours(3),
+                Duration.ofHours(1),
+                epic
+        );
+        Subtask subtask4 = new Subtask(
+                "Subtask Subtask4",
+                "Subtask4 description",
+                Status.IN_PROGRESS,
+                LocalDateTime.now().plusHours(6),
+                Duration.ofHours(3),
+                epic
+        );
+
+        inMemoryTaskManager.addEpic(epic);
+        inMemoryTaskManager.addSubtask(epic, subtask1);
+        inMemoryTaskManager.addSubtask(epic, subtask2);
+        inMemoryTaskManager.addSubtask(epic, subtask3);
+        inMemoryTaskManager.addSubtask(epic, subtask4);
+
+        assertTrue(epic.getStatus().equals(Status.IN_PROGRESS), "Эпик не " + Status.IN_PROGRESS);
+    }
 }

@@ -1,7 +1,9 @@
 package manager;
 
-public class Managers {
+import java.time.format.DateTimeFormatter;
 
+public class Managers {
+    public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm:ss");
     private static final HistoryManager historyManager = new InMemoryHistoryManager();
     private static final TaskManager taskManager = new InMemoryTaskManager();
     private static final FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager();

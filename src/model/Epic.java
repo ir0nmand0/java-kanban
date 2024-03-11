@@ -1,9 +1,9 @@
 package model;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class Epic extends Task {
-
     private final Map <Integer, Subtask> subtasks = new LinkedHashMap<>();
 
     public Epic(String name, String description) {
@@ -19,7 +19,11 @@ public class Epic extends Task {
     }
 
     public void addSubtask(Subtask subtask) {
-        Integer taskId = subtask.getId();
+        if (Objects.isNull(subtask)) {
+            return;
+        }
+
+        int taskId = subtask.getId();
 
         if (subtasks.containsKey(taskId)) {
             return;
@@ -27,9 +31,13 @@ public class Epic extends Task {
 
         subtasks.put(taskId, subtask);
         updateStatus();
+        updateTime();
     }
 
-    public void addSubtask(Integer id, Subtask subtask) {
+    public void addSubtask(int id, Subtask subtask) {
+        if (Objects.isNull(subtask)) {
+            return;
+        }
 
         if (subtasks.containsKey(id)) {
             return;
@@ -37,11 +45,16 @@ public class Epic extends Task {
 
         subtasks.put(id, subtask);
         updateStatus();
+        updateTime();
     }
 
     public void updateSubtask(Subtask oldSubtask, Subtask subtask) {
-        Integer taskId = subtask.getId();
-        Integer oldTaskId = oldSubtask.getId();
+        if (Objects.isNull(oldSubtask) || Objects.isNull(subtask)) {
+            return;
+        }
+
+        int taskId = subtask.getId();
+        int oldTaskId = oldSubtask.getId();
 
         if (!subtasks.containsKey(oldTaskId)) {
             return;
@@ -54,6 +67,7 @@ public class Epic extends Task {
         subtasks.remove(oldTaskId);
         subtasks.put(taskId, subtask);
         updateStatus();
+        updateTime();
     }
 
     private void updateStatus() {
@@ -76,5 +90,26 @@ public class Epic extends Task {
         } else {
             status = Status.IN_PROGRESS;
         }
+    }
+
+    private void updateTime() {
+        startTime = subtasks.values().stream()
+                        .map(Task::getStartTime)
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .min(LocalDateTime::compareTo)
+                        .orElse(null);
+
+        if (startTime == null) {
+            return;
+        }
+
+        duration = Duration.ofSeconds(subtasks.values().stream()
+                .map(Task::getDuration)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(Duration::toSeconds)
+                .mapToLong(Long::longValue)
+                .sum());
     }
 }

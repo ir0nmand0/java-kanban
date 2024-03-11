@@ -10,6 +10,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class FileBackedTaskManager implements TaskManager {
@@ -19,13 +21,14 @@ public class FileBackedTaskManager implements TaskManager {
     private final String head;
     private final String fieldHistory;
     private final String nameHistoryManager;
+
     public FileBackedTaskManager() {
         this.historyManager = Managers.getHistoryManager();
         this.taskManager = Managers.getTaskManager();
         this.fieldHistory = String.format("%s:", historyManager.getClass().getSimpleName());
         this.nameHistoryManager = String.format("%s.txt", historyManager.getClass().getSimpleName());
         this.nameBackedTaskManager = String.format("%s.csv", getClass().getSimpleName());
-        this.head = "id;type;name;status;description;epic";
+        this.head = "id;type;name;status;description;start;end;epic";
         loadTask();
         loadHistory();
     }
@@ -78,6 +81,12 @@ public class FileBackedTaskManager implements TaskManager {
         };
     }
 
+    private Optional<LocalDateTime> getTime(final String string) {
+        return string.isEmpty() ? Optional.empty() : Optional.ofNullable(
+                LocalDateTime.parse(string.trim().toLowerCase(), Managers.formatter)
+        );
+    }
+
     private String getType(final String string) {
         return switch (string.trim().toLowerCase()) {
             case "task" -> Task.class.getSimpleName().toLowerCase();
@@ -121,8 +130,8 @@ public class FileBackedTaskManager implements TaskManager {
 
             try {
                 tmpTask.put(Integer.parseInt(list.getFirst().trim()), list);
-            } catch (NumberFormatException e) {
-                //Игнорируем все, кроме чисел
+            } catch (NumberFormatException ignored) {
+
             }
         }
 
@@ -141,20 +150,37 @@ public class FileBackedTaskManager implements TaskManager {
 
             switch (type) {
                 case "task" -> {
-                    taskManager.addTask(new Task(id, name, description, status));
+                    LocalDateTime startTime;
+                    LocalDateTime endTime;
+
+                    try {
+                        startTime = getTime(list.get(5)).orElse(null);
+                        endTime = getTime(list.get(6)).orElse(null);
+                    } catch (IndexOutOfBoundsException ignored) {
+                        startTime = null;
+                        endTime = null;
+                    }
+
+                    Duration duration = startTime != null && endTime != null
+                            ? Duration.between(startTime, endTime) : null;
+
+                    if (startTime != null && duration != null) {
+                        taskManager.addTask(new Task(id, name, description, status, startTime, duration));
+                    } else {
+                        taskManager.addTask(new Task(id, name, description, status));
+                    }
                 }
                 case "epic" -> {
                     taskManager.addEpic(new Epic(id, name, description));
                 }
-                case "subtask" -> {
-                    subtasks.put(id, list);
-                }
+                case "subtask" -> subtasks.put(id, list);
             }
         }
 
         for (Map.Entry<Integer, List<String>> entry : subtasks.entrySet()) {
             List<String> list = entry.getValue();
-            Integer id = entry.getKey();
+            int id = entry.getKey();
+
             try {
                 int epicId = Integer.parseInt(list.getLast().trim());
 
@@ -164,13 +190,30 @@ public class FileBackedTaskManager implements TaskManager {
                     );
                 }
 
-                final Epic epic = taskManager.getEpic(epicId);
+                final Epic epic = taskManager.getEpic(epicId).orElse(null);
                 final String name =  list.get(2);
                 final String description = list.get(4);
                 final Status status = getStatus(list.get(3));
+                LocalDateTime startTime;
+                LocalDateTime endTime;
 
-                epic.addSubtask(new Subtask(id, name,
-                        description, status, epic));
+                try {
+                    startTime = getTime(list.get(5)).orElse(null);
+                    endTime = getTime(list.get(6)).orElse(null);
+                } catch (IndexOutOfBoundsException ignored) {
+                    startTime = null;
+                    endTime = null;
+                }
+
+                Duration duration = startTime != null && endTime != null
+                        ? Duration.between(startTime, endTime) : null;
+
+                if (startTime != null && duration != null) {
+                    epic.addSubtask(new Subtask(id, name, description, status, startTime, duration, epic));
+                } else {
+                    epic.addSubtask(new Subtask(id, name, description, status, epic));
+                }
+
             } catch (NumberFormatException e) {
                 throw e.getMessage() != null ? new ManagerReadException(String.format(
                         "%s и нет id эпика", e.getMessage()))
@@ -202,8 +245,8 @@ public class FileBackedTaskManager implements TaskManager {
                         idHistory.add(Integer.parseInt(list.get(i)));
                     }
 
-                } catch (NumberFormatException e) {
-                    //Игнорируем все, кроме чисел
+                } catch (NumberFormatException ignored) {
+
                 }
             }
 
@@ -211,15 +254,14 @@ public class FileBackedTaskManager implements TaskManager {
 
             for (Integer id : idHistory) {
                 if (containsKeyInTasks(id)) {
-                    historyManager.add(getTask(id));
+                    historyManager.add(getTask(id).orElse(null));
                 } else if (containsKeyInEpics(id)) {
-                    historyManager.add(getEpic(id));
+                    historyManager.add(getEpic(id).orElse(null));
                 } else {
-                    for (Map.Entry<Integer, Epic> entry : getMapEpics().entrySet()) {
-                        if (entry.getValue().getMapSubtasks().containsKey(id)) {
-                            historyManager.add(entry.getValue().getMapSubtasks().get(id));
-                        }
-                    }
+                    getMapEpics().values().stream()
+                            .filter(epic -> epic.getMapSubtasks().containsKey(id))
+                            .map(epic -> epic.getMapSubtasks().get(id))
+                            .forEach(historyManager::add);
                 }
             }
         }
@@ -256,25 +298,25 @@ public class FileBackedTaskManager implements TaskManager {
     }
 
     @Override
-    public Epic getEpic(Integer id) {
-        Epic epic = taskManager.getEpic(id);
+    public Optional<Epic> getEpic(int id) {
+        if (taskManager.getEpic(id).isPresent()) {
+            saveHistory();
+        }
 
-        saveHistory();
-
-        return epic;
+        return taskManager.getEpic(id);
     }
 
     @Override
-    public Task getTask(Integer id) {
-        Task task = taskManager.getTask(id);
+    public Optional<Task> getTask(int id) {
+        if (taskManager.getTask(id).isPresent()) {
+            saveHistory();
+        }
 
-        saveHistory();
-
-        return task;
+        return taskManager.getTask(id);
     }
 
     @Override
-    public void removeTask(Integer id) {
+    public void removeTask(int id) {
         taskManager.removeTask(id);
         saveTask();
         saveHistory();
@@ -288,7 +330,7 @@ public class FileBackedTaskManager implements TaskManager {
     }
 
     @Override
-    public void removeSubtask(Integer epicId, Integer subtaskId) {
+    public void removeSubtask(int epicId, int subtaskId) {
         taskManager.removeSubtask(epicId, subtaskId);
         saveTask();
         saveHistory();
@@ -302,14 +344,14 @@ public class FileBackedTaskManager implements TaskManager {
     }
 
     @Override
-    public void removeSubtask(Integer subtaskId) {
+    public void removeSubtask(int subtaskId) {
         taskManager.removeSubtask(subtaskId);
         saveTask();
         saveHistory();
     }
 
     @Override
-    public void removeEpic(Integer id) {
+    public void removeEpic(int id) {
         taskManager.removeEpic(id);
         saveTask();
         saveHistory();
@@ -337,12 +379,12 @@ public class FileBackedTaskManager implements TaskManager {
     }
 
     @Override
-    public Subtask getSubtask(Integer idSubtask) {
-        Subtask subtask = taskManager.getSubtask(idSubtask);
+    public Optional<Subtask> getSubtask(int idSubtask) {
+        if (taskManager.getSubtask(idSubtask).isPresent()) {
+            saveHistory();
+        }
 
-        saveHistory();
-
-        return subtask;
+        return taskManager.getSubtask(idSubtask);
     }
 
     @Override
@@ -376,13 +418,18 @@ public class FileBackedTaskManager implements TaskManager {
     }
 
     @Override
-    public List<Subtask> getSubtasks(Integer idEpic) {
+    public List<Subtask> getSubtasks(int idEpic) {
         return taskManager.getSubtasks(idEpic);
     }
 
     @Override
     public List<Subtask> getSubtasks(Epic epic) {
         return taskManager.getSubtasks(epic);
+    }
+
+    @Override
+    public List<Task> getPrioritizedTasks() {
+        return taskManager.getPrioritizedTasks();
     }
 
     public String getNameBackedTaskManager() {
