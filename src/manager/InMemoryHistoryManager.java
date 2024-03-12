@@ -1,10 +1,9 @@
 package manager;
 import model.Task;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private InMemoryNode<Task> inMemoryNode;
@@ -27,6 +26,10 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void add(Task task) {
+        if (Objects.isNull(task)) {
+            return;
+        }
+
         if (history.containsKey(task.getId())) {
             inMemoryNode.remove(history.get(task.getId()));
         }
@@ -48,15 +51,15 @@ public class InMemoryHistoryManager implements HistoryManager {
             return list;
         }
 
-        for (Node<Task> node = inMemoryNode.getHead(); node != null; node = node.getNext()) {
-            list.add(node.getTask());
-        }
-
-        return list;
+        return Stream.iterate(inMemoryNode.getHead(), Objects::nonNull, Node::getNext).map(Node::getTask).toList();
     }
 
     @Override
     public void remove(Task task) {
+        if (Objects.isNull(task)) {
+            return;
+        }
+
         if (!history.containsKey(task.getId())) {
             return;
         }
@@ -83,21 +86,14 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void clear(Map<Integer,? extends Task> map) {
-        for (Map.Entry<Integer,? extends Task> entry : map.entrySet()) {
-            if (history.containsKey(entry.getKey())) {
-                remove(entry.getKey());
-            }
-        }
+        map.keySet().stream()
+                .filter(task -> history.containsKey(task))
+                .mapToInt(i -> i)
+                .forEach(this::remove);
     }
 
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        for (Task task : getHistory()) {
-            stringBuilder.append(String.format("%d,", task.getId()));
-        }
-
-        return stringBuilder.toString();
+        return getHistory().stream().map(task -> String.format("%d,", task.getId())).collect(Collectors.joining());
     }
 }
