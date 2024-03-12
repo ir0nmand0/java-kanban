@@ -82,7 +82,7 @@ public class FileBackedTaskManager implements TaskManager {
     }
 
     private Optional<LocalDateTime> getTime(final String string) {
-        return string.isEmpty() ? Optional.empty() : Optional.ofNullable(
+        return Objects.isNull(string) || string.isEmpty() ? Optional.empty() : Optional.ofNullable(
                 LocalDateTime.parse(string.trim().toLowerCase(), Managers.formatter)
         );
     }
@@ -142,7 +142,15 @@ public class FileBackedTaskManager implements TaskManager {
 
         for (Map.Entry<Integer, List<String>> entry : tmpTask.entrySet()) {
             List<String> list = entry.getValue();
-            final Integer id = entry.getKey();
+            final int id = entry.getKey();
+
+            if ( list.get(1).isEmpty()
+                    || list.get(2).isEmpty()
+                    || list.get(3).isEmpty()
+                    || list.get(4).isEmpty()) {
+                continue;
+            }
+
             final String type = getType(list.get(1));
             final String name =  list.get(2);
             final String description = list.get(4);
@@ -150,15 +158,12 @@ public class FileBackedTaskManager implements TaskManager {
 
             switch (type) {
                 case "task" -> {
-                    LocalDateTime startTime;
-                    LocalDateTime endTime;
+                    LocalDateTime startTime = null;
+                    LocalDateTime endTime = null;
 
-                    try {
+                    if (list.size() > 6) {
                         startTime = getTime(list.get(5)).orElse(null);
                         endTime = getTime(list.get(6)).orElse(null);
-                    } catch (IndexOutOfBoundsException ignored) {
-                        startTime = null;
-                        endTime = null;
                     }
 
                     Duration duration = startTime != null && endTime != null
@@ -191,18 +196,23 @@ public class FileBackedTaskManager implements TaskManager {
                 }
 
                 final Epic epic = taskManager.getEpic(epicId).orElse(null);
+
+                if ( Objects.isNull(epic)
+                        || list.get(2).isEmpty()
+                        || list.get(3).isEmpty()
+                        || list.get(4).isEmpty()) {
+                    continue;
+                }
+
                 final String name =  list.get(2);
                 final String description = list.get(4);
                 final Status status = getStatus(list.get(3));
-                LocalDateTime startTime;
-                LocalDateTime endTime;
+                LocalDateTime startTime = null;
+                LocalDateTime endTime = null;
 
-                try {
+                if (list.size() > 6) {
                     startTime = getTime(list.get(5)).orElse(null);
                     endTime = getTime(list.get(6)).orElse(null);
-                } catch (IndexOutOfBoundsException ignored) {
-                    startTime = null;
-                    endTime = null;
                 }
 
                 Duration duration = startTime != null && endTime != null

@@ -86,7 +86,10 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void clear(Map<Integer,? extends Task> map) {
-        map.keySet().stream().filter(task -> history.containsKey(task)).mapToInt(i -> i).forEach(this::remove);
+        map.keySet().stream()
+                .filter(task -> history.containsKey(task))
+                .mapToInt(i -> i)
+                .forEach(this::remove);
     }
 
     @Override
