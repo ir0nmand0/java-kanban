@@ -1,35 +1,34 @@
 package model;
+import com.google.gson.annotations.Expose;
 import manager.Managers;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+
+import static manager.Managers.*;
 
 public class Task {
-    private final String name;
-    private final String description;
-    private final Integer mainId;
+    @Expose
+    protected final String name;
+    @Expose
+    protected final String description;
+    @Expose(deserialize = false)
+    protected final int id;
+    @Expose(serialize = false, deserialize = false)
+    private static int lastId = 1;
+    @Expose
     protected Status status;
-    private static Integer newId = 1;
+    @Expose
     protected Duration duration;
+    @Expose
     protected LocalDateTime startTime;
 
     public Task(String name, String description, Status status) {
         this.name = name;
         this.description = description;
         this.status = status;
-        this.mainId = getNewId();
-        this.duration = null;
-        this.startTime = null;
-    }
-
-    public Task(Integer id, String name, String description, Status status) {
-        this.mainId = id;
-        this.name = name;
-        this.description = description;
-        this.status = status;
+        this.id = getFreeId();
         this.duration = null;
         this.startTime = null;
     }
@@ -38,16 +37,7 @@ public class Task {
         this.name = name;
         this.description = description;
         this.status = status;
-        this.mainId = getNewId();
-        this.duration = duration;
-        this.startTime = startTime;
-    }
-
-    public Task(Integer id, String name, String description, Status status, LocalDateTime startTime, Duration duration) {
-        this.mainId = id;
-        this.name = name;
-        this.description = description;
-        this.status = status;
+        this.id = getFreeId();
         this.duration = duration;
         this.startTime = startTime;
     }
@@ -66,37 +56,59 @@ public class Task {
         return Optional.ofNullable(startTime);
     }
 
-    public long getStartTimeToEpochSecond() {
-        return startTime != null ? startTime.toEpochSecond(ZoneOffset.UTC) : 0;
+    public long getStartTimeToEpochMilli() {
+        return Objects.nonNull(startTime) ? startTime.atZone(ZONE_ID).toInstant().toEpochMilli() : 0;
     }
 
     public Optional<Duration> getDuration() {
         return Optional.ofNullable(duration);
     }
 
-    private static Integer getNewId() {
-        if (newId == Integer.MAX_VALUE || newId < 0) {
-            throw new TaskAddException("Не допустимый ID для задачи");
+    private int getFreeId() {
+        if (lastId < Integer.MAX_VALUE) {
+            return lastId++;
         }
 
-        return newId++;
+        throw new TaskAddException("Свободного Id нет");
     }
 
     public int getId() {
-        return mainId;
+        return id;
+    }
+
+    public String toCsv() {
+        return String.format("%d;%s;%s;%s;%s;%s;%s;",
+                id, getClass().getSimpleName(), name, status, description, startTimeToString(), endTimeToString()
+        );
+    }
+
+    protected String startTimeToString() {
+        return getStartTime()
+                .map(localDateTime -> localDateTime.format(Managers.DATE_TIME_FORMATTER))
+                .orElse("");
+    }
+
+    protected String endTimeToString() {
+        return getEndTime().map(localDateTime -> localDateTime.format(Managers.DATE_TIME_FORMATTER)).orElse("");
+
+    }
+
+    protected long durationToLong() {
+        return getDuration()
+                .map(Duration::toSeconds)
+                .orElse(0L);
     }
 
     @Override
     public String toString() {
-        return String.format("%d;%s;%s;%s;%s;%s;%s;",
-                mainId, getClass().getSimpleName(), name, status, description,
-                getStartTime()
-                        .map(localDateTime -> localDateTime.format(Managers.formatter))
-                        .orElse(""),
-                getEndTime()
-                        .map(localDateTime -> localDateTime.format(Managers.formatter))
-                        .orElse("")
-        );
+        return Task.class.getSimpleName() + "{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", id=" + id +
+                ", status=" + status +
+                ", duration=" + durationToLong() +
+                ", startTime=" + startTimeToString() +
+                '}';
     }
 
     @Override
@@ -104,16 +116,23 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return Objects.equals(name, task.name)
+        return id == task.id && Objects.equals(name, task.name)
                 && Objects.equals(description, task.description)
-                && Objects.equals(mainId, task.mainId)
-                && status == task.status
-                && Objects.equals(duration, task.duration)
+                && status == task.status && Objects.equals(duration, task.duration)
+                && Objects.equals(startTime, task.startTime);
+    }
+
+    public boolean equalsWithoutId(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return Objects.equals(name, task.name) && Objects.equals(description, task.description)
+                && status == task.status && Objects.equals(duration, task.duration)
                 && Objects.equals(startTime, task.startTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, mainId, status, duration, startTime);
+        return Objects.hash(name, description, id, status, duration, startTime);
     }
 }

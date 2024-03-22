@@ -1,46 +1,36 @@
 package test;
 import model.*;
-import manager.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
+
+import static manager.Managers.TASK_MANAGER;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TaskTest {
-    private final TaskManager taskManager = Managers.getTaskManager();
-    private final Task task1 = new Task("Task1 TaskTest", "TaskTest1 description", Status.NEW);
-    private final Task task2 = new Task("Task2 TaskTest", "TaskTest2 description", Status.IN_PROGRESS);
-    private final Task task3 = new Task("Task3 TaskTest", "TaskTest3 description", Status.NEW);
-    private final Task task4 = new Task("Task4 TaskTest", "TaskTest4 description",Status.NEW,
-                     LocalDateTime.now(), Duration.ofHours(1));
-    private final Task task5 = new Task("Task5 TaskTest", "TaskTest5 description", Status.IN_PROGRESS,
-                     LocalDateTime.now().minusHours(10), Duration.ofHours(3));
-    private Integer sizeTasks;
-    private Integer indexTask;
+public class TaskTest extends TasksEpicsSubtasks {
+    private int sizeTasks;
+    private int indexTask;
 
     @BeforeEach
     public void addTotaskTest() {
-        taskManager.addTask(task1);
-        taskManager.addTask(task3);
-        taskManager.addTask(task4);
-        taskManager.addTask(task5);
-        this.sizeTasks = taskManager.getTasks().size();
-        this.indexTask = taskManager.getTasks().indexOf(task1);
+        TASK_MANAGER.addTask(task1);
+        TASK_MANAGER.addTask(task3);
+        TASK_MANAGER.addTask(task4);
+        TASK_MANAGER.addTask(task5);
+        this.sizeTasks = TASK_MANAGER.getTasks().size();
+        this.indexTask = TASK_MANAGER.getTasks().indexOf(task1);
     }
 
     @Test
     public void checkAddTask() {
-        taskManager.addTask(task1);
+        TASK_MANAGER.addTask(task1);
 
-        assertTrue(taskManager.getTask(task1.getId()).isPresent(), "Задача не найдена.");
+        assertTrue(TASK_MANAGER.getTask(task1.getId()).isPresent(), "Задача не найдена.");
     }
 
     @Test
     public void getTasks() {
-        final List<Task> tasks = taskManager.getTasks();
+        final List<Task> tasks = TASK_MANAGER.getTasks();
 
         assertNotNull(tasks, "Задачи не возвращаются.");
         assertEquals(sizeTasks, tasks.size(), "Неверное количество задач.");
@@ -49,38 +39,38 @@ public class TaskTest {
 
     @Test
     public void updateTask() {
-        taskManager.updateTask(task1, task2);
+        TASK_MANAGER.updateTask(task1, task2);
 
-        assertTrue(taskManager.getTask(task2.getId()).isPresent(), "Задача не найдена.");
+        assertTrue(TASK_MANAGER.getTask(task2.getId()).isPresent(), "Задача не найдена.");
 
-        this.indexTask = taskManager.getTasks().indexOf(task2);
+        this.indexTask = TASK_MANAGER.getTasks().indexOf(task2);
     }
 
     @Test
     public void removeTask() {
-        final Task taskFirst = taskManager.getTasks().getFirst();
-        final Task taskMiddle = taskManager.getTasks().get(indexTask / 2);
-        final Task taskLast = taskManager.getTasks().getLast();
+        final Task taskFirst = TASK_MANAGER.getTasks().getFirst();
+        final Task taskMiddle = TASK_MANAGER.getTasks().get(indexTask / 2);
+        final Task taskLast = TASK_MANAGER.getTasks().getLast();
 
-        taskManager.removeTask(taskFirst);
+        TASK_MANAGER.removeTask(taskFirst);
 
-        assertTrue(taskManager.getTask(taskFirst.getId()).isEmpty());
+        assertTrue(TASK_MANAGER.getTask(taskFirst.getId()).isEmpty());
 
-        taskManager.removeTask(taskMiddle);
+        TASK_MANAGER.removeTask(taskMiddle);
 
-        assertTrue(taskManager.getTask(taskMiddle.getId()).isEmpty());
+        assertTrue(TASK_MANAGER.getTask(taskMiddle.getId()).isEmpty());
 
-        taskManager.removeTask(taskLast);
+        TASK_MANAGER.removeTask(taskLast);
 
-        assertTrue(taskManager.getTask(taskLast.getId()).isEmpty());
+        assertTrue(TASK_MANAGER.getTask(taskLast.getId()).isEmpty());
 
-        this.indexTask = taskManager.getTasks().size();
+        this.indexTask = TASK_MANAGER.getTasks().size();
     }
 
     @Test
     public void clearTasks() {
-        taskManager.clearTasks();
-        assertEquals(taskManager.getTasks().size(), 0, "Задачи не удалены.");
+        TASK_MANAGER.clearTasks();
+        assertEquals(TASK_MANAGER.getTasks().size(), 0, "Задачи не удалены.");
     }
 
 }
