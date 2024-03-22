@@ -1,6 +1,9 @@
 package gson;
 
 import com.google.gson.*;
+import manager.FileBackedTaskManager;
+import manager.Managers;
+import manager.TaskManager;
 import model.Epic;
 import model.Status;
 import model.Subtask;
@@ -13,10 +16,11 @@ import java.util.Optional;
 
 import static http.HttpTaskServer.gsonDuration;
 import static http.HttpTaskServer.gsonLocalDateTime;
-import static manager.Managers.FILE_BACKED_TASK_MANAGER;
-import static manager.Managers.TASK_MANAGER;
 
 public class SubtaskDeserializer implements JsonDeserializer<Subtask> {
+    private final TaskManager fileTaskManager = Managers.getFileTaskManager();
+    private final TaskManager taskManager = Managers.getTaskManager();
+    
     @Override
     public Subtask deserialize(JsonElement jsonElement,
                                Type type, JsonDeserializationContext context) throws JsonParseException {
@@ -42,14 +46,14 @@ public class SubtaskDeserializer implements JsonDeserializer<Subtask> {
             return null;
         }
 
-        Status status = FILE_BACKED_TASK_MANAGER.getStatus(jsonStatus.getAsString());
+        Status status = fileTaskManager.getStatus(jsonStatus.getAsString());
 
         Optional<Epic> epic = Optional.empty();
         Optional<Subtask> oldSubtask = Optional.empty();
 
         if (Objects.nonNull(jsonEpicId) && !jsonEpicId.isJsonNull()) {
             try {
-                epic = TASK_MANAGER.getEpicWithoutHistory(jsonEpicId.getAsInt());
+                epic = taskManager.getEpicWithoutHistory(jsonEpicId.getAsInt());
             } catch (IllegalStateException | NumberFormatException exception) {
                 epic = Optional.empty();
             }
@@ -59,7 +63,7 @@ public class SubtaskDeserializer implements JsonDeserializer<Subtask> {
 
         if (Objects.nonNull(jsonId) && !jsonId.isJsonNull()) {
             try {
-                oldSubtask = TASK_MANAGER.getSubtaskWithoutHistory(jsonId.getAsInt());
+                oldSubtask = taskManager.getSubtaskWithoutHistory(jsonId.getAsInt());
 
             } catch (IllegalStateException | NumberFormatException exception) {
                 oldSubtask = Optional.empty();

@@ -1,6 +1,8 @@
 package gson;
 
 import com.google.gson.*;
+import manager.Managers;
+import manager.TaskManager;
 import model.Status;
 import model.Task;
 
@@ -11,9 +13,10 @@ import java.util.Objects;
 
 import static http.HttpTaskServer.gsonDuration;
 import static http.HttpTaskServer.gsonLocalDateTime;
-import static manager.Managers.FILE_BACKED_TASK_MANAGER;
 
 public class TaskDeserializer implements JsonDeserializer<Task> {
+    private final TaskManager fileTaskManager = Managers.getFileTaskManager();
+    
     @Override
     public Task deserialize(JsonElement jsonElement,
                             Type type, JsonDeserializationContext context) throws JsonParseException {
@@ -38,7 +41,7 @@ public class TaskDeserializer implements JsonDeserializer<Task> {
             return null;
         }
 
-        Status status = FILE_BACKED_TASK_MANAGER.getStatus(jsonStatus.getAsString());
+        Status status = fileTaskManager.getStatus(jsonStatus.getAsString());
 
         JsonElement jsonDuration = jsonObject.get("duration");
         JsonElement jsonStartTime = jsonObject.get("startTime");

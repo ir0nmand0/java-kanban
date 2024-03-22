@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import gson.*;
 import manager.Managers;
+import manager.TaskManager;
 import model.Task;
 
 import java.io.IOException;
@@ -13,11 +14,11 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static http.HttpTaskServer.writeResponse;
-import static manager.Managers.FILE_BACKED_TASK_MANAGER;
-import static manager.Managers.TASK_MANAGER;
 import static http.HttpTaskServer.gsonTask;
 
 public class TasksHandler implements HttpHandler {
+    private final TaskManager fileTaskManager = Managers.getFileTaskManager();
+    private final TaskManager taskManager = Managers.getTaskManager();
     private enum Endpoint {
         GET_TASKS, GET_TASK, ADD_TASK, UPDATE_TASK, DELETE, UNKNOWN
     }
@@ -49,6 +50,7 @@ public class TasksHandler implements HttpHandler {
                 jsonElement = JsonParser.parseString(new String(exchange.getRequestBody().readAllBytes(),
                         Managers.DEFAULT_CHARSET));
             } catch (JsonSyntaxException e) {
+                throw new RuntimeException("Не удалось распарсить данные", e);
             }
 
             if (Objects.isNull(jsonElement) || jsonElement.isJsonNull() || !jsonElement.isJsonObject()) {
@@ -70,7 +72,7 @@ public class TasksHandler implements HttpHandler {
 
         switch (endpoint) {
             case GET_TASKS -> {
-                List<Task> tasks = FILE_BACKED_TASK_MANAGER.getTasks();
+                List<Task> tasks = fileTaskManager.getTasks();
 
                 if (tasks.isEmpty()) {
                     writeResponse(exchange, "", 404);
@@ -81,7 +83,7 @@ public class TasksHandler implements HttpHandler {
             }
             case GET_TASK -> {
 
-                Optional<Task> task = FILE_BACKED_TASK_MANAGER.getTask(id);
+                Optional<Task> task = fileTaskManager.getTask(id);
 
                 if (task.isEmpty()) {
                     writeResponse(exchange, "", 404);
@@ -99,12 +101,12 @@ public class TasksHandler implements HttpHandler {
                     return;
                 }
 
-                if (TASK_MANAGER.timeIsConflict(task)) {
+                if (taskManager.timeIsConflict(task)) {
                     writeResponse(exchange, "", 406);
                     return;
                 }
 
-                FILE_BACKED_TASK_MANAGER.addTask(task);
+                fileTaskManager.addTask(task);
 
                 writeResponse(exchange, "", 201);
             }
@@ -116,7 +118,7 @@ public class TasksHandler implements HttpHandler {
 
                 if (!jsonId.isJsonNull()) {
                     try {
-                        oldTask = TASK_MANAGER.getTaskWithoutHistory(jsonId.getAsInt());
+                        oldTask = taskManager.getTaskWithoutHistory(jsonId.getAsInt());
 
                         if (oldTask.isEmpty()) {
                             writeResponse(exchange, "", 404);
@@ -135,12 +137,12 @@ public class TasksHandler implements HttpHandler {
                     return;
                 }
 
-                if (TASK_MANAGER.timeIsConflict(task)) {
+                if (taskManager.timeIsConflict(task)) {
                     writeResponse(exchange, "", 406);
                     return;
                 }
 
-                if (FILE_BACKED_TASK_MANAGER.updateTask(oldTask.get(), task)) {
+                if (fileTaskManager.updateTask(oldTask.get(), task)) {
                     writeResponse(exchange, "", 201);
                     return;
                 }
@@ -149,8 +151,8 @@ public class TasksHandler implements HttpHandler {
             }
 
             case DELETE -> {
-                if (FILE_BACKED_TASK_MANAGER.containsKeyInTasks(id)) {
-                    FILE_BACKED_TASK_MANAGER.removeTask(id);
+                if (fileTaskManager.containsKeyInTasks(id)) {
+                    fileTaskManager.removeTask(id);
                     writeResponse(exchange, "", 200);
                     return;
                 }

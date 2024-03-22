@@ -3,12 +3,10 @@ import model.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static manager.Managers.*;
-import static manager.Managers.TASK_MANAGER;
 
 public class InMemoryTaskManager implements TaskManager {
+    private final TaskManager fileTaskManager = Managers.getFileTaskManager();
+    private final HistoryManager historyManager = Managers.getHistoryManager();
     private final Map<Integer, Task> tasks = new LinkedHashMap<>();
     private final Map<Integer, Epic> epics = new LinkedHashMap<>();
     private final TreeMap<Long, Task> tasksByTime = new TreeMap<>();
@@ -67,7 +65,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void loadTask() {
-        FILE_BACKED_TASK_MANAGER.loadTask();
+        fileTaskManager.loadTask();
     }
 
     @Override
@@ -100,7 +98,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         tasksByTime.remove(oldTask.getStartTimeToEpochMilli());
         tasks.remove(oldTask.getId());
-        HISTORY_MANAGER.remove(oldTask);
+        historyManager.remove(oldTask);
 
         tasks.put(task.getId(), task);
         return true;
@@ -172,7 +170,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         tasksByTime.remove(oldSubtask.getStartTimeToEpochMilli());
         epics.get(epicId).updateSubtask(oldSubtask, subtask);
-        HISTORY_MANAGER.remove(oldSubtask);
+        historyManager.remove(oldSubtask);
 
         if (subtask.getEndTime().isPresent()) {
             tasksByTime.put(subtask.getStartTimeToEpochMilli(), subtask);
@@ -215,7 +213,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Optional<Epic> getEpic(int id) {
         if (epics.containsKey(id)) {
-            HISTORY_MANAGER.add(epics.get(id));
+            historyManager.add(epics.get(id));
         }
 
         return Optional.ofNullable(epics.get(id));
@@ -239,7 +237,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Optional<Task> getTask(int id) {
         if (tasks.containsKey(id)) {
-            HISTORY_MANAGER.add(tasks.get(id));
+            historyManager.add(tasks.get(id));
         }
 
         return Optional.ofNullable(tasks.get(id));
@@ -255,7 +253,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (tasks.containsKey(id)) {
             tasksByTime.remove(tasks.get(id).getStartTimeToEpochMilli());
             tasks.remove(id);
-            HISTORY_MANAGER.remove(id);
+            historyManager.remove(id);
         }
     }
 
@@ -286,7 +284,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         tasksByTime.remove(subtask.get().getStartTimeToEpochMilli());
         epic.removeSubtask(epicId);
-        HISTORY_MANAGER.remove(subtaskId);
+        historyManager.remove(subtaskId);
     }
 
     @Override
@@ -366,7 +364,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         epics.remove(id);
-        HISTORY_MANAGER.remove(id);
+        historyManager.remove(id);
     }
 
     @Override
@@ -386,7 +384,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         tasks.entrySet().forEach(e -> tasksByTime.remove(e.getValue().getStartTimeToEpochMilli()));
 
-        HISTORY_MANAGER.clear(tasks);
+        historyManager.clear(tasks);
         tasks.clear();
     }
 
@@ -402,7 +400,7 @@ public class InMemoryTaskManager implements TaskManager {
                 .filter(epicEntry -> !epicEntry.getValue().subtasksIsEmpty())
                 .forEach(epicEntry -> epicEntry.getValue().clearSubtasks());
 
-        HISTORY_MANAGER.clear(epics);
+        historyManager.clear(epics);
         epics.clear();
     }
 
@@ -415,7 +413,7 @@ public class InMemoryTaskManager implements TaskManager {
                 .findFirst();
 
         if (subtask.isPresent()) {
-            HISTORY_MANAGER.add(subtask.get());
+            historyManager.add(subtask.get());
         }
 
         return subtask;
@@ -465,5 +463,15 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public boolean idIsEmpty(int id) {
         return !containsKeyInTasks(id) && !containsKeyInEpics(id) && !containsKeyInSubtasks(id);
+    }
+
+    @Override
+    public Status getStatus(final String string) {
+        return switch (string.trim().toLowerCase()) {
+            case "new" -> Status.NEW;
+            case "in_progress" -> Status.IN_PROGRESS;
+            case "done" -> Status.DONE;
+            default -> throw new RuntimeException("не соответсвует ни одному из типов статуса задач");
+        };
     }
 }

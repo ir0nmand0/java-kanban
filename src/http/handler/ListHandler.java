@@ -5,6 +5,9 @@ import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import gson.*;
+import manager.HistoryManager;
+import manager.Managers;
+import manager.TaskManager;
 import model.Subtask;
 import model.Task;
 
@@ -16,10 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static http.HttpTaskServer.writeResponse;
-import static manager.Managers.HISTORY_MANAGER;
-import static manager.Managers.TASK_MANAGER;
 
 public class ListHandler implements HttpHandler {
+    private final TaskManager taskManager = Managers.getTaskManager();
+    private final HistoryManager historyManager = Managers.getHistoryManager();
+
 
     private final Gson gson = new GsonBuilder()
             .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
@@ -49,10 +53,10 @@ public class ListHandler implements HttpHandler {
 
         switch (requestPath[1]) {
             case "prioritized" -> {
-                list = TASK_MANAGER.getPrioritizedTasks();
+                list = taskManager.getPrioritizedTasks();
             }
             case "history" -> {
-                list = HISTORY_MANAGER.getHistory();
+                list = historyManager.getHistory();
             }
         }
 

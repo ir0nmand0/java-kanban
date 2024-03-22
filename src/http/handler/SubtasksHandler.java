@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import gson.*;
 import manager.Managers;
+import manager.TaskManager;
 import model.Subtask;
 
 import java.io.IOException;
@@ -13,11 +14,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static http.HttpTaskServer.writeResponse;
-import static manager.Managers.FILE_BACKED_TASK_MANAGER;
-import static manager.Managers.TASK_MANAGER;
 import static http.HttpTaskServer.gsonSubtask;
 
 public class SubtasksHandler implements HttpHandler {
+    private final TaskManager fileTaskManager = Managers.getFileTaskManager();
+    private final TaskManager taskManager = Managers.getTaskManager();
+    
     private enum Endpoint {
         GET_SUBTASKS, GET_SUBTASK, ADD_SUBTASK, DELETE_SUBTASK, UPDATE_SUBTASK, UNKNOWN
     }
@@ -50,6 +52,7 @@ public class SubtasksHandler implements HttpHandler {
                 jsonElement = JsonParser.parseString(new String(exchange.getRequestBody().readAllBytes(),
                         Managers.DEFAULT_CHARSET));
             } catch (JsonSyntaxException e) {
+                throw new RuntimeException("Не удалось распарсить данные", e);
             }
 
             if (Objects.isNull(jsonElement) || jsonElement.isJsonNull() || !jsonElement.isJsonObject()) {
@@ -71,7 +74,7 @@ public class SubtasksHandler implements HttpHandler {
 
         switch (endpoint) {
             case GET_SUBTASKS -> {
-                List<Subtask> subtasks = FILE_BACKED_TASK_MANAGER.getSubtasks();
+                List<Subtask> subtasks = fileTaskManager.getSubtasks();
 
                 if (subtasks.isEmpty()) {
                     writeResponse(exchange, "", 404);
@@ -82,7 +85,7 @@ public class SubtasksHandler implements HttpHandler {
             }
             case GET_SUBTASK -> {
 
-                Optional<Subtask> subtask = FILE_BACKED_TASK_MANAGER.getSubtask(id);
+                Optional<Subtask> subtask = fileTaskManager.getSubtask(id);
 
                 if (subtask.isEmpty()) {
                     writeResponse(exchange, "", 404);
@@ -100,12 +103,12 @@ public class SubtasksHandler implements HttpHandler {
                     return;
                 }
 
-                if (TASK_MANAGER.timeIsConflict(subtask)) {
+                if (taskManager.timeIsConflict(subtask)) {
                     writeResponse(exchange, "", 406);
                     return;
                 }
 
-                FILE_BACKED_TASK_MANAGER.addSubtask(subtask.getEpic(), subtask);
+                fileTaskManager.addSubtask(subtask.getEpic(), subtask);
 
                 writeResponse(exchange, "", 200);
             }
@@ -122,7 +125,7 @@ public class SubtasksHandler implements HttpHandler {
 
                 if (!jsonId.isJsonNull()) {
                     try {
-                        oldSubtask = TASK_MANAGER.getSubtaskWithoutHistory(jsonId.getAsInt());
+                        oldSubtask = taskManager.getSubtaskWithoutHistory(jsonId.getAsInt());
 
                         if (oldSubtask.isEmpty()) {
                             writeResponse(exchange, "", 404);
@@ -141,12 +144,12 @@ public class SubtasksHandler implements HttpHandler {
                     return;
                 }
 
-                if (TASK_MANAGER.timeIsConflict(subtask)) {
+                if (taskManager.timeIsConflict(subtask)) {
                     writeResponse(exchange, "", 406);
                     return;
                 }
 
-                if (FILE_BACKED_TASK_MANAGER.updateSubtask(subtask.getEpic(), oldSubtask.get(), subtask)) {
+                if (fileTaskManager.updateSubtask(subtask.getEpic(), oldSubtask.get(), subtask)) {
                     writeResponse(exchange, "", 201);
                     return;
                 }
@@ -155,8 +158,8 @@ public class SubtasksHandler implements HttpHandler {
             }
 
             case DELETE_SUBTASK -> {
-                if (FILE_BACKED_TASK_MANAGER.containsKeyInSubtasks(id)) {
-                    FILE_BACKED_TASK_MANAGER.removeSubtask(id);
+                if (fileTaskManager.containsKeyInSubtasks(id)) {
+                    fileTaskManager.removeSubtask(id);
                     writeResponse(exchange, "", 200);
                     return;
                 }

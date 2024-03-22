@@ -1,5 +1,8 @@
 package test;
 
+import manager.HistoryManager;
+import manager.Managers;
+import manager.TaskManager;
 import model.Epic;
 import model.Status;
 import model.Subtask;
@@ -12,6 +15,9 @@ import java.time.LocalDateTime;
 import static manager.Managers.ZONE_ID;
 
 public abstract class TasksEpicsSubtasks {
+    protected static final TaskManager fileTaskManager = Managers.getFileTaskManager();
+    protected static final TaskManager taskManager = Managers.getTaskManager();
+    protected static final HistoryManager historyManager = Managers.getHistoryManager();
     protected static final LocalDateTime timeFirstArtificialSatellite = LocalDateTime.ofInstant(
             Instant.ofEpochSecond(-386310686L), ZONE_ID);
     protected static final Task task1 = new Task("Task1 TaskTest", "TaskTest1 description", Status.NEW);
@@ -81,4 +87,7 @@ public abstract class TasksEpicsSubtasks {
             epic2
     );
 
+    public TasksEpicsSubtasks() {
+
+    }
 }

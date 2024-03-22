@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Objects;
+import java.util.Optional;
 
 public class Subtask extends Task {
 
@@ -45,7 +45,7 @@ public class Subtask extends Task {
     }
 
     private int getEpicId() {
-        return Objects.isNull(epic) ? 0 : epic.getId();
+        return Optional.ofNullable(epic).map(Epic::getId).orElse(0);
     }
 
     @Override

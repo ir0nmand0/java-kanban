@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import gson.*;
+import manager.HistoryManager;
+import manager.Managers;
 import model.Subtask;
 import model.Task;
 
@@ -15,9 +17,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static http.HttpTaskServer.writeResponse;
-import static manager.Managers.HISTORY_MANAGER;
 
 public class HistoryHandler implements HttpHandler {
+    private final HistoryManager historyManager = Managers.getHistoryManager();
 
     private final Gson gson = new GsonBuilder()
             .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
@@ -43,7 +45,7 @@ public class HistoryHandler implements HttpHandler {
             return;
         }
 
-        List<Task> list = HISTORY_MANAGER.getHistory();
+        List<Task> list = historyManager.getHistory();
 
         if (list.isEmpty()) {
             writeResponse(exchange, "", 404);

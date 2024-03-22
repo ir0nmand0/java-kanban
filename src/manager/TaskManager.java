@@ -75,4 +75,6 @@ public interface TaskManager {
     List<Task> getPrioritizedTasks();
 
     boolean idIsEmpty(int id);
+
+    Status getStatus(String string);
 }

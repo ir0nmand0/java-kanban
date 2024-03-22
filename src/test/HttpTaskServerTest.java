@@ -18,10 +18,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Objects;
-
-import static manager.Managers.FILE_BACKED_TASK_MANAGER;
 import static http.HttpTaskServer.*;
-import static manager.Managers.HISTORY_MANAGER;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HttpTaskServerTest extends TasksEpicsSubtasks {
@@ -151,27 +148,27 @@ class HttpTaskServerTest extends TasksEpicsSubtasks {
             "}";
 
     private void addTasks() {
-        FILE_BACKED_TASK_MANAGER.clearTasks();
-        FILE_BACKED_TASK_MANAGER.clearEpics();
-        FILE_BACKED_TASK_MANAGER.addTask(task1);
-        FILE_BACKED_TASK_MANAGER.addTask(task2);
-        FILE_BACKED_TASK_MANAGER.addTask(task3);
-        FILE_BACKED_TASK_MANAGER.addTask(task4);
-        FILE_BACKED_TASK_MANAGER.addEpic(epic1);
-        FILE_BACKED_TASK_MANAGER.addEpic(epicWithoutSubtask);
-        FILE_BACKED_TASK_MANAGER.addSubtask(epic1, subtask1);
-        FILE_BACKED_TASK_MANAGER.addSubtask(epic1, subtask2);
-        FILE_BACKED_TASK_MANAGER.addSubtask(epic1, subtask3);
-        FILE_BACKED_TASK_MANAGER.addSubtask(epic1, subtask4);
-        FILE_BACKED_TASK_MANAGER.getTask(task1.getId());
-        FILE_BACKED_TASK_MANAGER.getTask(task2.getId());
-        FILE_BACKED_TASK_MANAGER.getTask(task3.getId());
-        FILE_BACKED_TASK_MANAGER.getTask(task4.getId());
-        FILE_BACKED_TASK_MANAGER.getEpic(epic1.getId());
-        FILE_BACKED_TASK_MANAGER.getSubtask(subtask1.getId());
-        FILE_BACKED_TASK_MANAGER.getSubtask(subtask2.getId());
-        FILE_BACKED_TASK_MANAGER.getSubtask(subtask3.getId());
-        FILE_BACKED_TASK_MANAGER.getSubtask(subtask4.getId());
+        fileTaskManager.clearTasks();
+        fileTaskManager.clearEpics();
+        fileTaskManager.addTask(task1);
+        fileTaskManager.addTask(task2);
+        fileTaskManager.addTask(task3);
+        fileTaskManager.addTask(task4);
+        fileTaskManager.addEpic(epic1);
+        fileTaskManager.addEpic(epicWithoutSubtask);
+        fileTaskManager.addSubtask(epic1, subtask1);
+        fileTaskManager.addSubtask(epic1, subtask2);
+        fileTaskManager.addSubtask(epic1, subtask3);
+        fileTaskManager.addSubtask(epic1, subtask4);
+        fileTaskManager.getTask(task1.getId());
+        fileTaskManager.getTask(task2.getId());
+        fileTaskManager.getTask(task3.getId());
+        fileTaskManager.getTask(task4.getId());
+        fileTaskManager.getEpic(epic1.getId());
+        fileTaskManager.getSubtask(subtask1.getId());
+        fileTaskManager.getSubtask(subtask2.getId());
+        fileTaskManager.getSubtask(subtask3.getId());
+        fileTaskManager.getSubtask(subtask4.getId());
     }
 
     @BeforeEach
@@ -193,7 +190,7 @@ class HttpTaskServerTest extends TasksEpicsSubtasks {
 
         List<Task> tasks = gsonTask.fromJson(jsonElement, new ListTaskToken().getType());
 
-        assertEquals(tasks.size(), FILE_BACKED_TASK_MANAGER.getTasks().size(),
+        assertEquals(tasks.size(), fileTaskManager.getTasks().size(),
                 "Размер массива полученного и Json не равен размеру полученного из менеджера");
     }
 
@@ -205,7 +202,7 @@ class HttpTaskServerTest extends TasksEpicsSubtasks {
 
         List<Epic> epics = gsonEpic.fromJson(jsonElement, new ListTaskToken().getType());
 
-        assertEquals(epics.size(), FILE_BACKED_TASK_MANAGER.getEpics().size(),
+        assertEquals(epics.size(), fileTaskManager.getEpics().size(),
                 "Размер массива полученного и Json не равен размеру полученного из менеджера");
     }
 
@@ -278,7 +275,7 @@ class HttpTaskServerTest extends TasksEpicsSubtasks {
 
         List<Subtask> subtasks = gsonSubtask.fromJson(jsonElement, new ListTaskToken().getType());
 
-        assertEquals(subtasks.size(), FILE_BACKED_TASK_MANAGER.getEpic(idEpic1).get().getSubtasks().size(),
+        assertEquals(subtasks.size(), fileTaskManager.getEpic(idEpic1).get().getSubtasks().size(),
                 "Размер массива полученного и Json не равен размеру полученного из менеджера");
 
     }
@@ -376,10 +373,10 @@ class HttpTaskServerTest extends TasksEpicsSubtasks {
 
         List<Task> prioritized = gsonTask.fromJson(jsonElement, new ListTaskToken().getType());
 
-        assertEquals(prioritized.size(), FILE_BACKED_TASK_MANAGER.getPrioritizedTasks().size(),
+        assertEquals(prioritized.size(), fileTaskManager.getPrioritizedTasks().size(),
                 "Размер массива полученного и Json не равен размеру полученного из менеджера");
 
-        assertTrue(FILE_BACKED_TASK_MANAGER.getPrioritizedTasks().getFirst().equals(task3),
+        assertTrue(fileTaskManager.getPrioritizedTasks().getFirst().equals(task3),
                 "Задачи не отсортированы");
     }
 
@@ -391,7 +388,7 @@ class HttpTaskServerTest extends TasksEpicsSubtasks {
 
         List<Task> history = gsonTask.fromJson(jsonElement, new ListTaskToken().getType());
 
-        assertEquals(history.size(), HISTORY_MANAGER.getHistory().size(),
+        assertEquals(history.size(), historyManager.getHistory().size(),
                 "Размер массива полученного и Json не равен размеру полученного из менеджера");
     }
 
@@ -458,6 +455,7 @@ class HttpTaskServerTest extends TasksEpicsSubtasks {
             try {
                 jsonElement = JsonParser.parseString(response.body());
             } catch (JsonSyntaxException e) {
+                throw new RuntimeException("Не удалось распарсить данные", e);
             }
 
             if (Objects.isNull(jsonElement)) {

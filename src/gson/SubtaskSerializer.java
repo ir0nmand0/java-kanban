@@ -19,8 +19,8 @@ public class SubtaskSerializer implements JsonSerializer<Subtask> {
             return JsonParser.parseString(gsonSubtask.toJson(subtask)
             );
         } catch (JsonSyntaxException e) {
+            throw new RuntimeException("Не удалось распарсить данные", e);
         }
 
-        return null;
     }
 }

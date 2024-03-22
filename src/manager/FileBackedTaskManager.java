@@ -16,10 +16,12 @@ import java.util.*;
 import static manager.Managers.*;
 
 public class FileBackedTaskManager implements TaskManager {
+    private final HistoryManager historyManager = Managers.getHistoryManager();
+    private final TaskManager taskManager = Managers.getTaskManager();
     private final String nameBackedTaskManager = String.format("%s.csv", getClass().getSimpleName());
     private final String headCsv = "id;type;name;status;description;start;end;epicId";
-    private final String fieldHistory = String.format("%s:", HISTORY_MANAGER.getClass().getSimpleName());
-    private final String nameHistoryManager = String.format("%s.txt", HISTORY_MANAGER.getClass().getSimpleName());
+    private final String fieldHistory = String.format("%s:", historyManager.getClass().getSimpleName());
+    private final String nameHistoryManager = String.format("%s.txt", historyManager.getClass().getSimpleName());
 
     public FileBackedTaskManager() {
         loadTask();
@@ -51,26 +53,22 @@ public class FileBackedTaskManager implements TaskManager {
     }
 
     private void saveHistory() {
-        if (HISTORY_MANAGER.getHistory().isEmpty()) {
+        if (historyManager.getHistory().isEmpty()) {
             return;
         }
 
         try (Writer fileWriter = new FileWriter(nameHistoryManager, DEFAULT_CHARSET, false)) {
 
-            fileWriter.write(String.format("%s%s%n", fieldHistory, HISTORY_MANAGER.toCsv()));
+            fileWriter.write(String.format("%s%s%n", fieldHistory, historyManager.toCsv()));
 
         } catch (IOException e) {
             throw new ManagerSaveException(e);
         }
     }
 
+    @Override
     public Status getStatus(final String string) {
-        return switch (string.trim().toLowerCase()) {
-            case "new" -> Status.NEW;
-            case "in_progress" -> Status.IN_PROGRESS;
-            case "done" -> Status.DONE;
-            default -> throw new RuntimeException("не соответсвует ни одному из типов статуса задач");
-        };
+        return taskManager.getStatus(string);
     }
 
     public Optional<LocalDateTime> getTime(final String string) {
@@ -154,9 +152,9 @@ public class FileBackedTaskManager implements TaskManager {
             }
         }
 
-        HISTORY_MANAGER.clear();
-        TASK_MANAGER.clearTasks();
-        TASK_MANAGER.clearEpics();
+        historyManager.clear();
+        taskManager.clearTasks();
+        taskManager.clearEpics();
 
         Map<Integer, List<String>> subtasks = new LinkedHashMap<>();
         Map<Integer, Epic> epics = new HashMap<>();
@@ -202,7 +200,7 @@ public class FileBackedTaskManager implements TaskManager {
                         continue;
                     }
 
-                    TASK_MANAGER.addTask(task);
+                    taskManager.addTask(task);
                     if (history.containsKey(id)) {
                         history.put(id, task);
                     }
@@ -215,7 +213,7 @@ public class FileBackedTaskManager implements TaskManager {
                         history.put(id, epic);
                     }
 
-                    TASK_MANAGER.addEpic(epic);
+                    taskManager.addEpic(epic);
                 }
                 case "subtask" -> subtasks.put(id, list);
             }
@@ -283,12 +281,12 @@ public class FileBackedTaskManager implements TaskManager {
         }
 
         history.entrySet().stream()
-                .forEach(integerTaskEntry -> HISTORY_MANAGER.add(integerTaskEntry.getValue()));
+                .forEach(integerTaskEntry -> historyManager.add(integerTaskEntry.getValue()));
     }
 
     @Override
     public boolean addTask(Task task) {
-        if (TASK_MANAGER.addTask(task)) {
+        if (taskManager.addTask(task)) {
             saveTask();
             return true;
         }
@@ -300,7 +298,7 @@ public class FileBackedTaskManager implements TaskManager {
 
     @Override
     public boolean updateTask(Task oldTask, Task task) {
-        if (TASK_MANAGER.updateTask(oldTask, task)) {
+        if (taskManager.updateTask(oldTask, task)) {
             saveTask();
             saveHistory();
             return true;
@@ -311,7 +309,7 @@ public class FileBackedTaskManager implements TaskManager {
 
     @Override
     public boolean addSubtask(Subtask subtask) {
-        if (TASK_MANAGER.addSubtask(subtask)) {
+        if (taskManager.addSubtask(subtask)) {
             saveTask();
             return true;
         }
@@ -321,7 +319,7 @@ public class FileBackedTaskManager implements TaskManager {
 
     @Override
     public boolean addEpic(Epic epic) {
-        if (TASK_MANAGER.addEpic(epic)) {
+        if (taskManager.addEpic(epic)) {
             saveTask();
             return true;
         }
@@ -331,7 +329,7 @@ public class FileBackedTaskManager implements TaskManager {
 
     @Override
     public boolean addSubtask(Epic epic, Subtask subtask) {
-        if (TASK_MANAGER.addSubtask(epic, subtask)) {
+        if (taskManager.addSubtask(epic, subtask)) {
             saveTask();
             return true;
         }
@@ -341,7 +339,7 @@ public class FileBackedTaskManager implements TaskManager {
 
     @Override
     public boolean updateSubtask(Epic epic, Subtask oldSubtask, Subtask subtask) {
-        if (TASK_MANAGER.updateSubtask(epic, oldSubtask, subtask)) {
+        if (taskManager.updateSubtask(epic, oldSubtask, subtask)) {
             saveTask();
             saveHistory();
             return true;
@@ -352,7 +350,7 @@ public class FileBackedTaskManager implements TaskManager {
 
     @Override
     public Optional<Epic> getEpic(int id) {
-        Optional<Epic> epic = TASK_MANAGER.getEpic(id);
+        Optional<Epic> epic = taskManager.getEpic(id);
 
         if (epic.isPresent()) {
             saveHistory();
@@ -363,22 +361,22 @@ public class FileBackedTaskManager implements TaskManager {
 
     @Override
     public Optional<Epic> getEpicWithoutHistory(int id) {
-        return TASK_MANAGER.getEpicWithoutHistory(id);
+        return taskManager.getEpicWithoutHistory(id);
     }
 
     @Override
     public Optional<Task> getTaskWithoutHistory(int id) {
-        return TASK_MANAGER.getTaskWithoutHistory(id);
+        return taskManager.getTaskWithoutHistory(id);
     }
 
     @Override
     public Optional<Subtask> getSubtaskWithoutHistory(int id) {
-        return TASK_MANAGER.getSubtaskWithoutHistory(id);
+        return taskManager.getSubtaskWithoutHistory(id);
     }
 
     @Override
     public Optional<Task> getTask(int id) {
-        Optional<Task> task = TASK_MANAGER.getTask(id);
+        Optional<Task> task = taskManager.getTask(id);
 
         if (task.isPresent()) {
             saveHistory();
@@ -389,77 +387,77 @@ public class FileBackedTaskManager implements TaskManager {
 
     @Override
     public void removeTask(int id) {
-        TASK_MANAGER.removeTask(id);
+        taskManager.removeTask(id);
         saveTask();
         saveHistory();
     }
 
     @Override
     public void removeTask(Task task) {
-        TASK_MANAGER.removeTask(task);
+        taskManager.removeTask(task);
         saveTask();
         saveHistory();
     }
 
     @Override
     public void removeSubtask(int epicId, int subtaskId) {
-        TASK_MANAGER.removeSubtask(epicId, subtaskId);
+        taskManager.removeSubtask(epicId, subtaskId);
         saveTask();
         saveHistory();
     }
 
     @Override
     public void removeSubtask(Epic epic, Subtask subtask) {
-        TASK_MANAGER.removeSubtask(epic, subtask);
+        taskManager.removeSubtask(epic, subtask);
         saveTask();
         saveHistory();
     }
 
     @Override
     public void removeSubtask(Subtask subtask) {
-        TASK_MANAGER.removeSubtask(subtask);
+        taskManager.removeSubtask(subtask);
         saveTask();
         saveHistory();
     }
 
     @Override
     public void removeSubtask(int subtaskId) {
-        TASK_MANAGER.removeSubtask(subtaskId);
+        taskManager.removeSubtask(subtaskId);
         saveTask();
         saveHistory();
     }
 
     @Override
     public void removeEpic(int id) {
-        TASK_MANAGER.removeEpic(id);
+        taskManager.removeEpic(id);
         saveTask();
         saveHistory();
     }
 
     @Override
     public void removeEpic(Epic epic) {
-        TASK_MANAGER.removeEpic(epic);
+        taskManager.removeEpic(epic);
         saveTask();
         saveHistory();
     }
 
     @Override
     public void clearTasks() {
-        TASK_MANAGER.clearTasks();
+        taskManager.clearTasks();
         saveTask();
         saveHistory();
     }
 
     @Override
     public void clearEpics() {
-        TASK_MANAGER.clearEpics();
+        taskManager.clearEpics();
         saveTask();
         saveHistory();
     }
 
     @Override
     public Optional<Subtask> getSubtask(int idSubtask) {
-        Optional<Subtask> subtask = TASK_MANAGER.getSubtask(idSubtask);
+        Optional<Subtask> subtask = taskManager.getSubtask(idSubtask);
 
         if (subtask.isPresent()) {
             saveHistory();
@@ -470,17 +468,17 @@ public class FileBackedTaskManager implements TaskManager {
 
     @Override
     public List<Task> getTasks() {
-        return TASK_MANAGER.getTasks();
+        return taskManager.getTasks();
     }
 
     @Override
     public boolean timeIsConflict(Task task) {
-        return TASK_MANAGER.timeIsConflict(task);
+        return taskManager.timeIsConflict(task);
     }
 
     @Override
     public boolean updateSubtask(Subtask oldSubtask, Subtask subtask) {
-        if (TASK_MANAGER.updateSubtask(oldSubtask, subtask)) {
+        if (taskManager.updateSubtask(oldSubtask, subtask)) {
             saveTask();
             saveHistory();
             return true;
@@ -492,47 +490,47 @@ public class FileBackedTaskManager implements TaskManager {
 
     @Override
     public List<Epic> getEpics() {
-        return TASK_MANAGER.getEpics();
+        return taskManager.getEpics();
     }
 
     @Override
     public boolean containsKeyInTasks(int id) {
-        return TASK_MANAGER.containsKeyInTasks(id);
+        return taskManager.containsKeyInTasks(id);
     }
 
     @Override
     public boolean containsKeyInEpics(int id) {
-        return TASK_MANAGER.containsKeyInEpics(id);
+        return taskManager.containsKeyInEpics(id);
     }
 
     @Override
     public boolean containsKeyInSubtasks(int id) {
-        return TASK_MANAGER.containsKeyInSubtasks(id);
+        return taskManager.containsKeyInSubtasks(id);
     }
 
     @Override
     public List<Subtask> getSubtasks() {
-        return TASK_MANAGER.getSubtasks();
+        return taskManager.getSubtasks();
     }
 
     @Override
     public List<Subtask> getSubtasks(int idEpic) {
-        return TASK_MANAGER.getSubtasks(idEpic);
+        return taskManager.getSubtasks(idEpic);
     }
 
     @Override
     public List<Subtask> getSubtasks(Epic epic) {
-        return TASK_MANAGER.getSubtasks(epic);
+        return taskManager.getSubtasks(epic);
     }
 
     @Override
     public List<Task> getPrioritizedTasks() {
-        return TASK_MANAGER.getPrioritizedTasks();
+        return taskManager.getPrioritizedTasks();
     }
 
     @Override
     public boolean idIsEmpty(int id) {
-        return TASK_MANAGER.idIsEmpty(id);
+        return taskManager.idIsEmpty(id);
     }
 
     public String getNameBackedTaskManager() {

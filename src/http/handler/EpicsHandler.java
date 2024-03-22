@@ -5,22 +5,19 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import gson.*;
 import manager.Managers;
+import manager.TaskManager;
 import model.Epic;
 import model.Subtask;
 
 import java.io.IOException;
-import java.lang.reflect.Modifier;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static http.HttpTaskServer.writeResponse;
-import static manager.Managers.FILE_BACKED_TASK_MANAGER;
-import static http.HttpTaskServer.gsonEpic;
+import static http.HttpTaskServer.*;
 
 public class EpicsHandler implements HttpHandler {
+    private final TaskManager fileTaskManager = Managers.getFileTaskManager();
     private enum Endpoint {
         GET_EPICS, GET_EPIC, GET_SUBTASKS_BY_EPIC, ADD_EPIC, DELETE, UNKNOWN
     }
@@ -48,7 +45,7 @@ public class EpicsHandler implements HttpHandler {
 
         switch (endpoint) {
             case GET_EPICS -> {
-                List<Epic> epics = FILE_BACKED_TASK_MANAGER.getEpics();
+                List<Epic> epics = fileTaskManager.getEpics();
 
                 if (epics.isEmpty()) {
                     writeResponse(exchange, "", 404);
@@ -59,7 +56,7 @@ public class EpicsHandler implements HttpHandler {
             }
             case GET_EPIC -> {
 
-                Optional<Epic> epic = FILE_BACKED_TASK_MANAGER.getEpic(id);
+                Optional<Epic> epic = fileTaskManager.getEpic(id);
 
                 if (epic.isEmpty()) {
                     writeResponse(exchange, "", 404);
@@ -70,14 +67,14 @@ public class EpicsHandler implements HttpHandler {
             }
             case GET_SUBTASKS_BY_EPIC -> {
 
-                Optional<Epic> epic = FILE_BACKED_TASK_MANAGER.getEpicWithoutHistory(id);
+                Optional<Epic> epic = fileTaskManager.getEpicWithoutHistory(id);
 
                 if (epic.isEmpty()) {
                     writeResponse(exchange, "", 404);
                     return;
                 }
 
-                List<Subtask> subtasks = FILE_BACKED_TASK_MANAGER.getSubtasks(epic.get());
+                List<Subtask> subtasks = fileTaskManager.getSubtasks(epic.get());
 
                 if (subtasks.isEmpty()) {
                     writeResponse(exchange, String.format("", id),
@@ -85,15 +82,7 @@ public class EpicsHandler implements HttpHandler {
                     return;
                 }
 
-                writeResponse(exchange, new GsonBuilder()
-                        .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-                        .registerTypeAdapter(Duration.class, new DurationAdapter())
-                        .registerTypeAdapter(Epic.class, new EpicInSubtaskSerializer())
-                        .registerTypeAdapter(Subtask.class, new SubtaskDeserializer())
-                        .excludeFieldsWithModifiers(Modifier.STATIC)
-                        .excludeFieldsWithoutExposeAnnotation()
-                        .serializeNulls()
-                        .create().toJson(subtasks,  new ListTaskToken().getType()), 200);
+                writeResponse(exchange, gsonSubtask.toJson(subtasks,  new ListTaskToken().getType()), 200);
             }
 
             case ADD_EPIC -> {
@@ -104,6 +93,7 @@ public class EpicsHandler implements HttpHandler {
                     jsonElement = JsonParser.parseString(new String(exchange.getRequestBody().readAllBytes(),
                             Managers.DEFAULT_CHARSET));
                 } catch (JsonSyntaxException e) {
+                    throw new RuntimeException("Не удалось распарсить данные", e);
                 }
 
                 if (Objects.isNull(jsonElement) || jsonElement.isJsonNull() || !jsonElement.isJsonObject()) {
@@ -117,13 +107,13 @@ public class EpicsHandler implements HttpHandler {
                     writeResponse(exchange,"", 400);
                 }
 
-                FILE_BACKED_TASK_MANAGER.addEpic(epic);
+                fileTaskManager.addEpic(epic);
                 writeResponse(exchange, "", 201);
             }
 
             case DELETE -> {
-                if (FILE_BACKED_TASK_MANAGER.containsKeyInEpics(id)) {
-                    FILE_BACKED_TASK_MANAGER.removeEpic(id);
+                if (fileTaskManager.containsKeyInEpics(id)) {
+                    fileTaskManager.removeEpic(id);
                     writeResponse(exchange, "", 200);
                     return;
                 }

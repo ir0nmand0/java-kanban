@@ -1,5 +1,6 @@
 package test;
 
+import manager.FileBackedTaskManager;
 import model.Task;
 import org.junit.jupiter.api.*;
 
@@ -10,7 +11,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import static manager.Managers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -19,89 +19,92 @@ class FileBackedTaskManagerTest extends TasksEpicsSubtasks {
 
     @BeforeEach
     public void addTasks() {
-        FILE_BACKED_TASK_MANAGER.addTask(task1);
+        fileTaskManager.addTask(task1);
         allHistory.add(task1);
-        FILE_BACKED_TASK_MANAGER.addTask(task2);
+        fileTaskManager.addTask(task2);
         allHistory.add(task2);
-        FILE_BACKED_TASK_MANAGER.addTask(task3);
+        fileTaskManager.addTask(task3);
         allHistory.add(task3);
-        FILE_BACKED_TASK_MANAGER.addTask(task4);
+        fileTaskManager.addTask(task4);
         allHistory.add(task4);
-        FILE_BACKED_TASK_MANAGER.addEpic(epic1);
+        fileTaskManager.addEpic(epic1);
         allHistory.add(epic1);
-        FILE_BACKED_TASK_MANAGER.addSubtask(epic1, subtask1);
+        fileTaskManager.addSubtask(epic1, subtask1);
         allHistory.add(subtask1);
-        FILE_BACKED_TASK_MANAGER.addSubtask(epic1, subtask2);
+        fileTaskManager.addSubtask(epic1, subtask2);
         allHistory.add(subtask2);
-        FILE_BACKED_TASK_MANAGER.addSubtask(epic1, subtask3);
+        fileTaskManager.addSubtask(epic1, subtask3);
         allHistory.add(subtask3);
-        FILE_BACKED_TASK_MANAGER.addSubtask(epic1, subtask4);
+        fileTaskManager.addSubtask(epic1, subtask4);
         allHistory.add(subtask4);
-        FILE_BACKED_TASK_MANAGER.getTask(task1.getId());
-        FILE_BACKED_TASK_MANAGER.getTask(task2.getId());
-        FILE_BACKED_TASK_MANAGER.getTask(task3.getId());
-        FILE_BACKED_TASK_MANAGER.getTask(task4.getId());
-        FILE_BACKED_TASK_MANAGER.getEpic(epic1.getId());
-        FILE_BACKED_TASK_MANAGER.getSubtask(subtask1.getId());
-        FILE_BACKED_TASK_MANAGER.getSubtask(subtask2.getId());
-        FILE_BACKED_TASK_MANAGER.getSubtask(subtask3.getId());
-        FILE_BACKED_TASK_MANAGER.getSubtask(subtask4.getId());
+        fileTaskManager.getTask(task1.getId());
+        fileTaskManager.getTask(task2.getId());
+        fileTaskManager.getTask(task3.getId());
+        fileTaskManager.getTask(task4.getId());
+        fileTaskManager.getEpic(epic1.getId());
+        fileTaskManager.getSubtask(subtask1.getId());
+        fileTaskManager.getSubtask(subtask2.getId());
+        fileTaskManager.getSubtask(subtask3.getId());
+        fileTaskManager.getSubtask(subtask4.getId());
     }
 
     @Test
     public void conflictTimeInTask() {
-        FILE_BACKED_TASK_MANAGER.addTask(taskWithConflictTime);
+        fileTaskManager.addTask(taskWithConflictTime);
 
-        assertTrue(FILE_BACKED_TASK_MANAGER.getTasks().stream()
+        assertTrue(fileTaskManager.getTasks().stream()
                 .filter(e -> e.getId() == taskWithConflictTime.getId()).findAny().isEmpty(),
                 "Задача с конфликтом времени добавлена");
 
-        FILE_BACKED_TASK_MANAGER.addSubtask(epic1, subtaskWithConflictTime);
+        fileTaskManager.addSubtask(epic1, subtaskWithConflictTime);
 
-        assertTrue(FILE_BACKED_TASK_MANAGER.getSubtasks().stream()
+        assertTrue(fileTaskManager.getSubtasks().stream()
                         .filter(e -> e.getId() == subtaskWithConflictTime.getId()).findAny().isEmpty(),
                 "Подзадача с конфликтом времени добавлена");
     }
 
     @Test
     public void getPrioritizedTasks() {
-        Task taskFromSort = FILE_BACKED_TASK_MANAGER.getPrioritizedTasks().getFirst();
+        Task taskFromSort = fileTaskManager.getPrioritizedTasks().getFirst();
         assertTrue(taskFromSort.equalsWithoutId(task3), "Таски не отсортированы по времени");
     }
 
     @Test
     public void loadFromFile() throws IOException {
-        TASK_MANAGER.clearTasks();
-        TASK_MANAGER.clearEpics();
-        HISTORY_MANAGER.clear();
+        taskManager.clearTasks();
+        taskManager.clearEpics();
+        historyManager.clear();
 
-        assertEquals(TASK_MANAGER.getTasks().size(), 0);
-        assertEquals(TASK_MANAGER.getEpics().size(), 0);
-        assertEquals(TASK_MANAGER.getSubtasks().size(),0);
-        assertEquals(HISTORY_MANAGER.getHistory().size(), 0);
+        assertEquals(taskManager.getTasks().size(), 0);
+        assertEquals(taskManager.getEpics().size(), 0);
+        assertEquals(taskManager.getSubtasks().size(),0);
+        assertEquals(historyManager.getHistory().size(), 0);
         
         allHistory.clear();
         addTasks();
 
-        FILE_BACKED_TASK_MANAGER.loadTask();
+        fileTaskManager.loadTask();
 
-        assertEquals(TASK_MANAGER.getTasks().size() + TASK_MANAGER.getEpics().size()
-                + TASK_MANAGER.getSubtasks().size(), allHistory.size());
+        assertEquals(taskManager.getTasks().size() + taskManager.getEpics().size()
+                + taskManager.getSubtasks().size(), allHistory.size());
 
-        assertEquals(HISTORY_MANAGER.getHistory().size(), allHistory.size());
+        assertEquals(historyManager.getHistory().size(), allHistory.size());
     }
 
     @AfterAll
     public static void removeAllFile() throws IOException {
-        Path task = Paths.get(FILE_BACKED_TASK_MANAGER.getNameBackedTaskManager());
-        Path history = Paths.get(FILE_BACKED_TASK_MANAGER.getNameHistoryManager());
 
-        if (!Files.isDirectory(task)) {
-            Files.deleteIfExists(task);
-        }
+        if (fileTaskManager instanceof FileBackedTaskManager fileBackedTaskManager) {
+            Path task = Paths.get(fileBackedTaskManager.getNameBackedTaskManager());
+            Path history = Paths.get(fileBackedTaskManager.getNameHistoryManager());
 
-        if (!Files.isDirectory(history)) {
-            Files.deleteIfExists(history);
+            if (!Files.isDirectory(task)) {
+                Files.deleteIfExists(task);
+            }
+
+            if (!Files.isDirectory(history)) {
+                Files.deleteIfExists(history);
+            }
         }
     }
 
