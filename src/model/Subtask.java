@@ -1,19 +1,20 @@
 package model;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public class Subtask extends Task {
+
+    @Expose
+    @SerializedName(value = "epicId")
     private final Epic epic;
 
     public Subtask(String name, String description, Status status, Epic epic) {
         super(name, description, status);
-        epicIsEmpty(epic);
-        this.epic = epic;
-    }
-
-    public Subtask(Integer id, String name, String description, Status status, Epic epic) {
-        super(id, name, description, status);
         epicIsEmpty(epic);
         this.epic = epic;
     }
@@ -25,20 +26,31 @@ public class Subtask extends Task {
         this.epic = epic;
     }
 
-    public Subtask(Integer id, String name, String description,
-                   Status status, LocalDateTime startTime, Duration duration, Epic epic) {
-        super(id, name, description, status, startTime, duration);
-        epicIsEmpty(epic);
-        this.epic = epic;
-    }
-
     public Epic getEpic() {
         return epic;
     }
 
+
     @Override
     public String toString() {
-        return String.format("%s%d",super.toString(), epic.getId());
+        return Subtask.class.getSimpleName() + "{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", id=" + id +
+                ", status=" + status +
+                ", duration=" + durationToLong() +
+                ", startTime=" + startTimeToString() +
+                ", epicId=" + getEpicId() +
+                '}';
+    }
+
+    private int getEpicId() {
+        return Optional.ofNullable(epic).map(Epic::getId).orElse(0);
+    }
+
+    @Override
+    public String toCsv() {
+        return String.format("%s%d",super.toCsv(), epic.getId());
     }
 
     private void epicIsEmpty(Epic epic) {

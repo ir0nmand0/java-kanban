@@ -1,12 +1,6 @@
 package test;
 
 import manager.FileBackedTaskManager;
-import manager.HistoryManager;
-import manager.Managers;
-import manager.TaskManager;
-import model.Epic;
-import model.Status;
-import model.Subtask;
 import model.Task;
 import org.junit.jupiter.api.*;
 
@@ -14,135 +8,69 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class FileBackedTaskManagerTest {
+class FileBackedTaskManagerTest extends TasksEpicsSubtasks {
+    private static final List<Task> allHistory = new ArrayList<>();
 
-    private static TaskManager fileBackedTaskManager;
-    private static TaskManager taskManager;
-    private static HistoryManager historyManager;
-    private static Task task1;
-    private static Task task2;
-    private static Task task3;
-    private static Task task4;
-    private static Epic epic1;
-    private static List<Task> allHistory;
-    private static Subtask subtask1;
-    private static Subtask subtask2;
-    private static Subtask subtask3;
-    private static Subtask subtask4;
-
-    @BeforeAll
-    public static void firstInit() {
-        historyManager = Managers.getHistoryManager();
-        taskManager = Managers.getTaskManager();
-        fileBackedTaskManager = Managers.getFileBackedTaskManager();
-        task1 = new Task("Task1 TaskTest", "TaskTest1 description", Status.NEW);
-        task2 = new Task("Task2 TaskTest", "TaskTest2 description", Status.IN_PROGRESS);
-        task3 = new Task("Task3 TaskTest", "TaskTest3 description", Status.NEW,
-                LocalDateTime.now(), Duration.ofHours(1));
-        task4 = new Task("Task4 TaskTest", "TaskTest4 description", Status.IN_PROGRESS,
-                LocalDateTime.now().minusHours(10), Duration.ofHours(3));
-        allHistory = new ArrayList<>();
-        epic1 = new Epic("Epic EpicTest1", "EpicTest1 description");
-        subtask1 = new Subtask(
-                "Subtask Subtask1",
-                "Subtask1 description",
-                Status.NEW,
-                epic1
-        );
-        subtask2 = new Subtask(
-                "Subtask Subtask2",
-                "Subtask2 description",
-                Status.IN_PROGRESS,
-                epic1
-        );
-        subtask3 = new Subtask(
-                "Subtask Subtask3",
-                "Subtask3 description",
-                Status.DONE,
-                LocalDateTime.now().plusHours(3),
-                Duration.ofHours(1),
-                epic1
-        );
-        subtask4 = new Subtask(
-                "Subtask Subtask4",
-                "Subtask4 description",
-                Status.IN_PROGRESS,
-                LocalDateTime.now().plusHours(6),
-                Duration.ofHours(3),
-                epic1
-        );
-
-        fileBackedTaskManager.addTask(task1);
+    @BeforeEach
+    public void addTasks() {
+        fileTaskManager.addTask(task1);
         allHistory.add(task1);
-        fileBackedTaskManager.addTask(task2);
+        fileTaskManager.addTask(task2);
         allHistory.add(task2);
-        fileBackedTaskManager.addTask(task3);
+        fileTaskManager.addTask(task3);
         allHistory.add(task3);
-        fileBackedTaskManager.addTask(task4);
+        fileTaskManager.addTask(task4);
         allHistory.add(task4);
-        fileBackedTaskManager.addEpic(epic1);
+        fileTaskManager.addEpic(epic1);
         allHistory.add(epic1);
-        fileBackedTaskManager.addSubtask(epic1, subtask1);
+        fileTaskManager.addSubtask(epic1, subtask1);
         allHistory.add(subtask1);
-        fileBackedTaskManager.addSubtask(epic1, subtask2);
+        fileTaskManager.addSubtask(epic1, subtask2);
         allHistory.add(subtask2);
-        fileBackedTaskManager.addSubtask(epic1, subtask3);
+        fileTaskManager.addSubtask(epic1, subtask3);
         allHistory.add(subtask3);
-        fileBackedTaskManager.addSubtask(epic1, subtask4);
+        fileTaskManager.addSubtask(epic1, subtask4);
         allHistory.add(subtask4);
-        fileBackedTaskManager.getTask(task1.getId());
-        fileBackedTaskManager.getTask(task2.getId());
-        fileBackedTaskManager.getEpic(epic1.getId());
-        fileBackedTaskManager.getSubtask(subtask1.getId());
-        fileBackedTaskManager.getSubtask(subtask2.getId());
-        fileBackedTaskManager.getTask(task3.getId());
-        fileBackedTaskManager.getTask(task4.getId());
-        fileBackedTaskManager.getSubtask(subtask3.getId());
-        fileBackedTaskManager.getSubtask(subtask4.getId());
+        fileTaskManager.getTask(task1.getId());
+        fileTaskManager.getTask(task2.getId());
+        fileTaskManager.getTask(task3.getId());
+        fileTaskManager.getTask(task4.getId());
+        fileTaskManager.getEpic(epic1.getId());
+        fileTaskManager.getSubtask(subtask1.getId());
+        fileTaskManager.getSubtask(subtask2.getId());
+        fileTaskManager.getSubtask(subtask3.getId());
+        fileTaskManager.getSubtask(subtask4.getId());
     }
 
     @Test
     public void conflictTimeInTask() {
-        Task task = new Task("Task1 TaskTest", "TaskTest1 description", Status.NEW,
-                task3.getStartTime().get().plusMinutes(1), Duration.ofHours(5));
-        fileBackedTaskManager.addTask(task);
+        fileTaskManager.addTask(taskWithConflictTime);
 
-        assertTrue(fileBackedTaskManager.getTasks().stream()
-                .filter(e -> e.getId() == task.getId()).findAny().isEmpty(),
+        assertTrue(fileTaskManager.getTasks().stream()
+                .filter(e -> e.getId() == taskWithConflictTime.getId()).findAny().isEmpty(),
                 "Задача с конфликтом времени добавлена");
 
-        Subtask subtask = new Subtask(
-                "Subtask Subtask3",
-                "Subtask3 description",
-                Status.DONE,
-                subtask3.getStartTime().get(),
-                Duration.ofHours(3),
-                epic1);
+        fileTaskManager.addSubtask(epic1, subtaskWithConflictTime);
 
-        fileBackedTaskManager.addSubtask(epic1, subtask);
-
-        assertTrue(fileBackedTaskManager.getSubtasks().stream()
-                        .filter(e -> e.getId() == subtask.getId()).findAny().isEmpty(),
+        assertTrue(fileTaskManager.getSubtasks().stream()
+                        .filter(e -> e.getId() == subtaskWithConflictTime.getId()).findAny().isEmpty(),
                 "Подзадача с конфликтом времени добавлена");
     }
 
     @Test
     public void getPrioritizedTasks() {
-
-        assertEquals(fileBackedTaskManager.getPrioritizedTasks().getFirst().toString(), task4.toString(),
-                "Таски не отсортированы по времени");
+        Task taskFromSort = fileTaskManager.getPrioritizedTasks().getFirst();
+        assertTrue(taskFromSort.equalsWithoutId(task3), "Таски не отсортированы по времени");
     }
 
     @Test
-    public void loadFromFile() {
+    public void loadFromFile() throws IOException {
         taskManager.clearTasks();
         taskManager.clearEpics();
         historyManager.clear();
@@ -151,15 +79,14 @@ class FileBackedTaskManagerTest {
         assertEquals(taskManager.getEpics().size(), 0);
         assertEquals(taskManager.getSubtasks().size(),0);
         assertEquals(historyManager.getHistory().size(), 0);
+        
+        allHistory.clear();
+        addTasks();
 
-        fileBackedTaskManager.loadTask();
-        taskManager.getEpics();
-        taskManager.getSubtasks();
+        fileTaskManager.loadTask();
 
         assertEquals(taskManager.getTasks().size() + taskManager.getEpics().size()
                 + taskManager.getSubtasks().size(), allHistory.size());
-
-        fileBackedTaskManager.loadHistory();
 
         assertEquals(historyManager.getHistory().size(), allHistory.size());
     }
@@ -167,19 +94,17 @@ class FileBackedTaskManagerTest {
     @AfterAll
     public static void removeAllFile() throws IOException {
 
-        if (!(fileBackedTaskManager instanceof FileBackedTaskManager backedTaskManager)) {
-            return;
-        }
+        if (fileTaskManager instanceof FileBackedTaskManager fileBackedTaskManager) {
+            Path task = Paths.get(fileBackedTaskManager.getNameBackedTaskManager());
+            Path history = Paths.get(fileBackedTaskManager.getNameHistoryManager());
 
-        Path task = Paths.get(backedTaskManager.getNameBackedTaskManager());
-        Path history = Paths.get(backedTaskManager.getNameHistoryManager());
+            if (!Files.isDirectory(task)) {
+                Files.deleteIfExists(task);
+            }
 
-        if (!Files.isDirectory(task)) {
-            Files.deleteIfExists(task);
-        }
-
-        if (!Files.isDirectory(history)) {
-            Files.deleteIfExists(history);
+            if (!Files.isDirectory(history)) {
+                Files.deleteIfExists(history);
+            }
         }
     }
 

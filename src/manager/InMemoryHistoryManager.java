@@ -36,7 +36,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
         Node<Task> node = inMemoryNode.add(task);
 
-        if (node == null) {
+        if (Objects.isNull(node)) {
             return;
         }
 
@@ -45,10 +45,8 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public List<Task> getHistory() {
-        List<Task> list = new ArrayList<>();
-
-        if (inMemoryNode.getHead() == null) {
-            return list;
+        if (Objects.isNull(inMemoryNode.getHead())) {
+            new ArrayList<>();
         }
 
         return Stream.iterate(inMemoryNode.getHead(), Objects::nonNull, Node::getNext).map(Node::getTask).toList();
@@ -94,6 +92,13 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public String toString() {
+        return "InMemoryHistoryManager{" +
+                "history=" + getHistory() +
+                '}';
+    }
+
+    @Override
+    public String toCsv() {
         return getHistory().stream().map(task -> String.format("%d,", task.getId())).collect(Collectors.joining());
     }
 }

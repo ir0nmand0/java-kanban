@@ -1,25 +1,14 @@
 package test;
 import model.*;
-import manager.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TaskTest {
-    private final TaskManager taskManager = Managers.getTaskManager();
-    private final Task task1 = new Task("Task1 TaskTest", "TaskTest1 description", Status.NEW);
-    private final Task task2 = new Task("Task2 TaskTest", "TaskTest2 description", Status.IN_PROGRESS);
-    private final Task task3 = new Task("Task3 TaskTest", "TaskTest3 description", Status.NEW);
-    private final Task task4 = new Task("Task4 TaskTest", "TaskTest4 description",Status.NEW,
-                     LocalDateTime.now(), Duration.ofHours(1));
-    private final Task task5 = new Task("Task5 TaskTest", "TaskTest5 description", Status.IN_PROGRESS,
-                     LocalDateTime.now().minusHours(10), Duration.ofHours(3));
-    private Integer sizeTasks;
-    private Integer indexTask;
+public class TaskTest extends TasksEpicsSubtasks {
+    private int sizeTasks;
+    private int indexTask;
 
     @BeforeEach
     public void addTotaskTest() {

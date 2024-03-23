@@ -2,6 +2,8 @@ package manager;
 
 import model.Task;
 
+import java.util.Objects;
+
 public class InMemoryNode<T extends Task> {
     private Node<T> head;
     private Node<T> tail;
@@ -12,13 +14,13 @@ public class InMemoryNode<T extends Task> {
     }
 
     public Node<T> add(T task) {
-        if (head != null && tail.getTask().getId() == task.getId()) {
+        if (Objects.nonNull(head) && tail.getTask().getId() == task.getId()) {
             return null;
         }
 
         Node<T> node = new Node<>(task);
 
-        if (head == null) {
+        if (Objects.isNull(head)) {
             head = node;
         } else {
             tail.setNext(node);
@@ -31,26 +33,26 @@ public class InMemoryNode<T extends Task> {
     }
 
     public void remove(Node<T> node) {
-        if (head == null) {
+        if (Objects.isNull(head)) {
             return;
         }
 
         Node<T> next = node.getNext();
         Node<T> prev = node.getPrev();
 
-        if (next != null) {
+        if (Objects.nonNull(next)) {
             next.setPrev(prev);
         }
 
-        if (prev != null) {
+        if (Objects.nonNull(prev)) {
             prev.setNext(next);
         }
 
-        if (head == node) {
+        if (head.equals(node)) {
             head = next;
         }
 
-        if (tail == node) {
+        if (tail.equals(node)) {
             tail = prev;
         }
     }

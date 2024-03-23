@@ -4,52 +4,20 @@ import manager.*;
 import model.*;
 import org.junit.jupiter.api.*;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class HistoryManagerTest {
-    private static TaskManager taskManager;
-    private static HistoryManager historyManager;
-    private static Task task1;
-    private static Task task2;
-    private static Task task3;
-    private static Task task4;
-    private static Task task5;
-    private static Epic epic1;
-    private static List<Task> allHistory;
-    private static Subtask subtask1;
-    private static Subtask subtask2;
+public class HistoryManagerTest extends TasksEpicsSubtasks {
+    private static final List<Task> allHistory = new ArrayList<>();
 
     @BeforeAll
     public static void firstInit() {
-        historyManager = new InMemoryHistoryManager();
-        taskManager = new InMemoryTaskManager(historyManager);
+        taskManager.clearTasks();
+        taskManager.clearEpics();
         historyManager.clear();
-        task1 = new Task("Task1 TaskTest", "TaskTest1 description", Status.NEW);
-        task2 = new Task("Task2 TaskTest", "TaskTest2 description", Status.IN_PROGRESS);
-        task3 = new Task("Task3 TaskTest", "TaskTest3 description", Status.NEW);
-        task4 = new Task("Task4 TaskTest", "TaskTest4 description",Status.NEW,
-                LocalDateTime.now(), Duration.ofHours(1));
-        task5 = new Task("Task5 TaskTest", "TaskTest5 description", Status.IN_PROGRESS,
-                LocalDateTime.now().minusHours(10), Duration.ofHours(3));
-        epic1 = new Epic("Epic EpicTest1", "EpicTest1 description");
-        allHistory = new ArrayList<>();
-        subtask1 = new Subtask(
-                "Subtask Subtask1",
-                "Subtask1 description",
-                Status.NEW,
-                epic1
-        );
-        subtask2 = new Subtask(
-                "Subtask Subtask2",
-                "Subtask2 description",
-                Status.IN_PROGRESS, epic1
-        );
-
+        allHistory.clear();
         taskManager.addTask(task1);
         allHistory.add(task1);
         taskManager.addTask(task2);
@@ -58,8 +26,6 @@ public class HistoryManagerTest {
         allHistory.add(task3);
         taskManager.addTask(task4);
         allHistory.add(task4);
-        taskManager.addTask(task5);
-        allHistory.add(task5);
         taskManager.addEpic(epic1);
         allHistory.add(epic1);
         taskManager.addSubtask(epic1, subtask1);
@@ -78,8 +44,10 @@ public class HistoryManagerTest {
 
     @Test
     public void getHistory() {
+        firstInit();
         assertNotEquals(historyManager.getHistory().size(), 0, "История задач не получена");
-        assertEquals(historyManager.getHistory().size(), allHistory.size(), "Истории задач не равны");
+        assertEquals(allHistory.stream().map(Task::getId).toList(),
+                historyManager.getHistory().stream().map(Task::getId).toList(), "Истории задач не равны");
     }
 
     @Test

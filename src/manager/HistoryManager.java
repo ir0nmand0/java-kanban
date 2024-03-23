@@ -18,4 +18,6 @@ public interface HistoryManager {
     void clear();
 
     void clear(Map<Integer, ? extends Task> map);
+
+    String toCsv();
 }

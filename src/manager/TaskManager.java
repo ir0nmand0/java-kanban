@@ -2,34 +2,39 @@ package manager;
 import model.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public interface TaskManager {
 
+    boolean timeIsConflict(Task task);
+
     void loadTask();
 
-    void loadHistory();
+    boolean addTask(Task task);
 
-    void addTask(Task task);
+    boolean addSubtask(Epic epic, Subtask subtask);
 
-    void addSubtask(Epic epic, Subtask subtask);
+    boolean addEpic(Epic epic);
 
-    void addEpic(Epic epic);
+    boolean updateTask(Task oldTask, Task task);
 
-    void updateTask(Task oldTask, Task task);
+    boolean addSubtask(Subtask subtask);
 
-    void updateSubtask(Epic epic, Subtask oldSubtask, Subtask subtask);
+    boolean updateSubtask(Epic epic, Subtask oldSubtask, Subtask subtask);
 
     Optional<Task> getTask(int id);
 
-    Map<Integer, Epic> getMapEpics();
-
     List<Task> getTasks();
+
+    boolean updateSubtask(Subtask oldSubtask, Subtask subtask);
 
     Optional<Epic> getEpic(int id);
 
+    Optional<Epic> getEpicWithoutHistory(int id);
+
     List<Epic> getEpics();
+
+    Optional<Task> getTaskWithoutHistory(int id);
 
     void removeTask(int id);
 
@@ -39,9 +44,13 @@ public interface TaskManager {
 
     void removeSubtask(Epic epic, Subtask subtask);
 
+    void removeSubtask(Subtask subtask);
+
     void removeSubtask(int idSubtask);
 
     boolean containsKeyInEpics(int id);
+
+    boolean containsKeyInSubtasks(int id);
 
     boolean containsKeyInTasks(int id);
 
@@ -55,6 +64,8 @@ public interface TaskManager {
 
     Optional<Subtask> getSubtask(int idSubtask);
 
+    Optional<Subtask> getSubtaskWithoutHistory(int id);
+
     List<Subtask> getSubtasks();
 
     List<Subtask> getSubtasks(int idEpic);
@@ -62,4 +73,8 @@ public interface TaskManager {
     List<Subtask> getSubtasks(Epic epic);
 
     List<Task> getPrioritizedTasks();
+
+    boolean idIsEmpty(int id);
+
+    Status getStatus(String string);
 }
